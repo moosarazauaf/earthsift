@@ -5,6 +5,19 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.41] - 2026-11-15
+
+### Added
+- **Share an area overview**: a link (`?at=lon,lat,km`) opens the overview
+  at that place. "Share this risk check" sends the flooding, landslide and
+  week-ahead verdicts as text with the link, through the phone's share
+  sheet (WhatsApp, SMS) or the clipboard on a desktop.
+- **Jump bar** on the area overview: one tap to any of its 13 sections.
+
+### Changed
+- On touch screens, links, segment buttons and chips get a finger-sized
+  target of about 40 px.
+
 ## [0.2.0-alpha.40] - 2026-11-14
 
 A second user walkthrough. Sentri's model now answers every prompt itself.
