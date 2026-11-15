@@ -6,7 +6,7 @@ import { DistrictCard } from "./ui/DistrictCard";
 import { QuakeCard } from "./hazards/QuakeCard";
 import { Readout } from "./ui/Readout";
 import { ContextPanel } from "./analysis/ContextPanel";
-import { decodeView } from "./app/logic";
+import { decodeView, parseAt } from "./app/logic";
 import { decodeRun, modeForRun } from "./app/shareRun";
 import { useStore } from "./app/store";
 import { SwipeHandle } from "./compare/SwipeHandle";
@@ -27,6 +27,12 @@ function restoreFromUrl() {
   const view = decodeView(window.location.search);
   const store = useStore.getState();
   const hasRun = new URLSearchParams(window.location.search).has("run");
+  const at = parseAt(window.location.search);
+  if (at) {
+    useStore.getState().analyseAt(at.lon, at.lat, at.km);
+    void getGlobe()?.flyTo(at.lon, at.lat, at.km * 4000, 0);
+    return;
+  }
   if (Object.keys(view).length === 0 && !hasRun) return;
   store.set({
     introOpen: false,

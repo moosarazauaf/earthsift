@@ -8,6 +8,8 @@ import {
   datasetForArea,
   datasetForYear,
   decodeView,
+  parseAt,
+  atLink,
   encodeView,
   formatArea,
   formatSigned,
@@ -156,5 +158,13 @@ describe("circle around a point", () => {
       const dx = (lon! - 74.3) * 111.32 * Math.cos((31.5 * Math.PI) / 180), dy = (lat! - 31.5) * 111.32;
       expect(Math.hypot(dx, dy)).toBeCloseTo(50, 0);
     }
+  });
+});
+
+describe("shared overview links", () => {
+  it("round-trips a place and size, and refuses anything out of range", () => {
+    const link = atLink("https://x.example/earthsift/", 71.9812, 34.0156, 5);
+    expect(parseAt(new URL(link).search)).toEqual({ lon: 71.9812, lat: 34.0156, km: 5 });
+    for (const bad of ["at=200,10,5", "at=10,95,5", "at=10,10,99", "at=10,10", "at=a,b,c", ""]) expect(parseAt(bad)).toBeNull();
   });
 });

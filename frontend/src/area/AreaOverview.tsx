@@ -5,7 +5,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 
-import { formatArea, formatLatLon } from "../app/logic";
+import { atLink, formatArea, formatLatLon } from "../app/logic";
 import { useStore } from "../app/store";
 import { deviceProfile, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
 import { type PopulationResult, formatPeople } from "../engine/population";
@@ -76,6 +76,7 @@ function Overview() {
         <div className="row-actions">
           <button onClick={saveCurrentPlace} disabled={saved} title="Keep this area in My places, in this browser (Shift+S)">{saved ? t("area.saved") : t("area.save")}</button>
           <button onClick={() => window.print()} title="Print this overview, or save it as a PDF">{t("area.print")}</button>
+          {centre && <button onClick={() => void shareText(aoi.label, overviewLink(centre, size))} title="Send a link that opens this overview">Share</button>}
         </div>
         <p className="muted">
           {formatArea(projected.areaM2 / 10_000)} · centre {formatLatLon(lat, lon)} ·{" "}
@@ -91,6 +92,7 @@ function Overview() {
           </div>
         )}
       </section>
+      <JumpBar />
       <RiskSection lat={lat} lon={lon} />
       <QuickRuns />
       <Outlook lat={lat} lon={lon} />
@@ -106,6 +108,40 @@ function Overview() {
       <Solar lat={lat} lon={lon} />
       <Nearby lat={lat} lon={lon} />
     </>
+  );
+}
+
+// ---- sharing and the jump bar ---------------------------------------------------------------
+
+const overviewLink = (centre: [number, number], km: number) => atLink(`${window.location.origin}${window.location.pathname}`, centre[0], centre[1], km);
+
+/** The phone's share sheet where there is one (WhatsApp, SMS, mail), else the clipboard. */
+async function shareText(title: string, url: string, text?: string) {
+  const set = useStore.getState().set;
+  try {
+    // On a desktop the system share sheet is unexpected; the clipboard is what people want there.
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) { await navigator.share({ title, text, url }); return; }
+    await navigator.clipboard.writeText(text ? `${text}\n${url}` : url);
+    set({ notice: text ? "The summary and link are copied: paste them into a message." : "Link copied: it opens this overview." });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") return; // the visitor closed the share sheet
+    set({ notice: `Copy this link: ${url}` });
+  }
+}
+
+const JUMPS = ["Risk check", "Analyse", "Next 7 days", "Land cover", "Terrain", "Water", "People", "Official", "Rain", "Air", "Climate", "Solar", "Nearby"];
+
+/** The overview is long: one tap scrolls to a section, whose heading starts with the chip's word. */
+function JumpBar() {
+  const jump = (word: string, el: HTMLElement) => {
+    const panel = el.closest(".panel") ?? document;
+    const h = [...panel.querySelectorAll("h3")].find((x) => x.textContent?.toLowerCase().startsWith(word.toLowerCase()) || (word === "Nearby" && /nearby/i.test(x.textContent ?? "")));
+    h?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  return (
+    <nav className="jump-bar" aria-label="Sections of this overview">
+      {JUMPS.map((w) => <button key={w} className="chip" onClick={(e) => jump(w, e.currentTarget)}>{w}</button>)}
+    </nav>
   );
 }
 
@@ -142,6 +178,11 @@ function RiskSection({ lat, lon }: { lat: number; lon: number }) {
             <p className="muted">Higher ground at {formatLatLon(check.ground.lat, check.ground.lon)}, about {Math.round(check.ground.aboveM)} m above the centre.{" "}
               <button className="link" onClick={() => useStore.getState().set({ measure: [[lon, lat], [check.ground!.lon, check.ground!.lat]] })}>Show the way on the map</button></p>
           )}
+          <button className="link" onClick={() => {
+            const c = useStore.getState().pickCentre ?? [lon, lat];
+            const lines = check.items.map((r) => `${r.title}: ${LEVEL_WORD[r.level]}. ${r.text}`);
+            void shareText(`Risk check, ${aoi.label}`, overviewLink(c, useStore.getState().pickSizeKm), `Risk check for ${aoi.label} (Earthsift, satellite data):\n${lines.join("\n")}`);
+          }}>Share this risk check</button>
           <p className="muted">{RISK_SOURCES}</p>
         </>
       )}

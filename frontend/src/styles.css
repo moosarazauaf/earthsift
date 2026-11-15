@@ -853,3 +853,13 @@ button.primary { color: #1b1d14; }
 .risk.high .level { background: #e57373; }
 .risk.medium .level { background: #ffb74d; }
 .risk.low .level { background: #a5d6a7; }
+
+/* Jump bar: the overview's sections, one tap away; it stays at the top of the panel while scrolling. */
+.jump-bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 8px; background: var(--panel-solid); scrollbar-width: thin; }
+.jump-bar .chip { flex: none; }
+
+/* Touch screens: small links and segment buttons get a finger-sized target (about 40 px) without moving the text around them. */
+@media (pointer: coarse) {
+  .panel .link { padding-block: 10px; margin-block: -10px; }
+  .panel .seg button, .panel .chip, .figure-tools button { min-height: 40px; }
+}

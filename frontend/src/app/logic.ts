@@ -80,6 +80,16 @@ export function encodeView(view: ViewState): string {
   return params.toString();
 }
 
+/** "?at=lon,lat,km": an area overview someone shared. Anything out of range is ignored. */
+export function parseAt(query: string): { lon: number; lat: number; km: number } | null {
+  const parts = (new URLSearchParams(query).get("at") ?? "").split(",").map(Number);
+  if (parts.length !== 3 || parts.some((v) => !Number.isFinite(v))) return null;
+  const [lon, lat, km] = parts as [number, number, number];
+  return Math.abs(lon) <= 180 && Math.abs(lat) <= 90 && km >= 1 && km <= 50 ? { lon, lat, km } : null;
+}
+
+export const atLink = (base: string, lon: number, lat: number, km: number) => `${base}?at=${lon.toFixed(4)},${lat.toFixed(4)},${km}`;
+
 /** Parse a query string, ignoring anything malformed rather than trusting it. */
 export function decodeView(query: string): Partial<ViewState> {
   const params = new URLSearchParams(query);
