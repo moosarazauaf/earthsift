@@ -863,3 +863,6 @@ button.primary { color: #1b1d14; }
   .panel .link { padding-block: 10px; margin-block: -10px; }
   .panel .seg button, .panel .chip, .figure-tools button { min-height: 40px; }
 }
+
+/* Headings scrolled to from the jump bar stop below it, not under it. */
+.panel h3 { scroll-margin-top: 56px; }
