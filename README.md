@@ -46,6 +46,34 @@ scenes, the method and the limits behind it.
 
 ## What you can do
 
+### 🧭 Start from your question
+The opening screen asks *"What do you need to know about a place?"* and
+offers the questions people actually bring: is this land safe to build on or
+buy, where did the flood reach and who lives there, what is happening right
+now, is the coming week safe, how much carbon does this land hold, how has
+this place changed, maps and figures for a report, and buffer, terrain and
+export for GIS work. Each card opens Sentri with the question ready; or type
+your own question and it goes straight to Sentri.
+
+### 🏡 Is this land safe? The risk check
+At the top of every area overview, and from Sentri (*"Is Nowshera safe?"*,
+*"Has Sukkur flooded before?"*, *"flood risk of Charsadda"*), each hazard gets
+one word, **High**, **Some** or **Low**, before any detail:
+
+- **Flooding**: how much of the area has been under water only some of the
+  time since 1984 (JRC Global Surface Water): floodplain that has flooded
+  before and can again.
+- **Landslides**: how much of the area is steeper than 15°.
+- **Next 7 days**: heavy rain, dangerous heat, frost, gales or unhealthy air
+  in the forecast.
+
+For flood-prone places it finds the **nearest higher ground**, at least 10 m
+above the centre (a whole block of the height data, so a single building or
+tree is not taken for a hill), and draws the way there on the map with its
+distance and elevation profile. Nowshera: flooding high, higher ground 1.5 km
+north and 15 m up. **Share this risk check** sends the verdicts as text with a
+link, through the phone's share sheet (WhatsApp, SMS) or the clipboard.
+
 ### 💬 Ask in plain words
 Type a request in the search box, such as *"floods in Layyah in August
 2022"*, *"how much has Lake Urmia shrunk since 2000"* or *"is Lahore
@@ -61,7 +89,8 @@ for every analysis.
 **Analyse → Ask Sentri**). Ask it in plain words: *"map the floods in Layyah
 from 25 August to 5 September 2022"*, *"how much carbon is stored there?"*,
 *"land cover of Islamabad"*, *"how many people live in Peshawar?"*, *"make a
-time-lapse of Dubai"*, *"show wind and sea temperature"*. A free NVIDIA
+time-lapse of Dubai"*, *"show wind and sea temperature"*, *"is Sukkur safe?"*,
+*"buffer 3 km"*, *"slope map of Murree"*, *"export this area as KML"*. A free NVIDIA
 Nemotron model on OpenRouter chooses what to do; Earthsift's own code does
 it and writes the answer, so numbers, dates and checks never come from the
 model. It remembers the conversation ("there", "the same place"), suggests
@@ -77,6 +106,20 @@ a mean over the flood period, a logarithm on data already in dB, and missing
 speckle filtering or before-after comparison.
 
 <img src="docs/media/sentri.jpg" alt="Sentri, the pixel-art satellite assistant, answering 'Carbon stock of Layyah, Pakistan' beside the globe: 24,911 t of carbon in plants (plus or minus 4,118 t) and 200,103 t in the top 30 cm of soil, with a bar chart and error bars that saves as SVG or 300 dpi PNG" width="100%">
+
+### 📐 GIS tools, by asking
+QGIS-style analysis without installing anything, from the area overview or
+with a short prompt to Sentri:
+
+- **Buffer** an area by a distance (*"buffer 2 km"*); the buffered area
+  becomes the area in use.
+- **Terrain**: lowest, highest and mean height, mean slope and the share in
+  each slope class, with a chart; **hillshade**, **slope** and **aspect**
+  maps drawn on the globe.
+- **Measure** area, perimeter, centre point and bounding box (area in the
+  local UTM zone).
+- **Export** the area as **GeoJSON** for QGIS, ArcGIS or Earth Engine, or
+  **KML** for Google Earth.
 
 ### 🌱 Carbon stock and land cover
 For any area: **carbon in plants** (above and below ground, Harmonized Global
@@ -117,7 +160,10 @@ since 2000, an index series since 1990, surface water through time,
 built-up growth, tree cover, how hot the ground gets, whether it is flooded
 now, and whether it has burned recently. Drawing or uploading an area opens
 the same overview; **☆ Save** keeps it in My places (<kbd>M</kbd>) together with
-your recent analyses, and **Print report** saves the overview as a PDF. Saved
+your recent analyses, **Print report** saves the overview as a PDF, and
+**Share** gives a link (`?at=lon,lat,km`) that opens the same overview for
+whoever you send it to. A **jump bar** at the top takes you to any of the
+overview's sections in one tap. Saved
 places are watched: when Earthsift opens it tells you about hazard news,
 earthquakes or alerts near any of them. The overview also shows the rain of
 the last days against normal, how many people live in the area (GHS-POP
@@ -324,6 +370,10 @@ install icon in the address bar).
   Some will be off-topic or misplaced; every story links to its sources.
 - Carbon stock shows plants as they were in 2010 and soil to 30 cm only;
   soil carbon from SoilGrids is modelled and its range is wide.
+- The risk check's flood history ends in 2021 and misses floods that came and
+  went between satellite images, under cloud, or in town streets. It is a
+  first look, not a survey: check with local authorities before building or
+  buying.
 - Sentri's free model can misread a request. It never reports a number it did
   not get from Earthsift's code, and a planned analysis only runs when you
   press Run.
