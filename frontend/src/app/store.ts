@@ -153,7 +153,7 @@ interface State {
   areaCover: { overlay: Overlay; shares: { code: number; name: string; ha: number; share: number }[]; resolution: number } | null;
   showCover: boolean;
   /** A terrain map (hillshade, slope or aspect) drawn over the area; takes the place of the land-cover map while set. */
-  terrainMap: { kind: TerrainKind; overlay: Overlay } | null;
+  terrainMap: { kind: TerrainKind | "rise"; overlay: Overlay } | null;
   /** Share of the current area steeper than 15 degrees, once terrain has been read. */
   areaSteepShare: number | null;
   /** People in the current area (GHS-POP 2020), once counted. */

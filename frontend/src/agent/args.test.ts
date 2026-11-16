@@ -84,6 +84,10 @@ describe("chat memory and the built-in reader", () => {
     expect(offlineIntent("turn off clouds and rain")).toEqual({ tool: "show_layers", place: null, args: { clouds: false, rain: false } });
     expect(offlineIntent("show sea surface temperature")).toEqual({ tool: "show_layers", place: null, args: { earth_today: "sst" } });
     expect(offlineIntent("show wind in Karachi")).toBeNull();
+    expect(offlineIntent("what floods if the river rises 2 m in Layyah")).toEqual({ tool: "flood_rise", place: "Layyah", args: { metres: 2 } });
+    expect(offlineIntent("5 m flood here")).toEqual({ tool: "flood_rise", place: null, args: { metres: 5 } });
+    expect(offlineIntent("when can I spray in Okara?")).toEqual({ tool: "field_work", place: "Okara" });
+    expect(offlineIntent("is it safe to work outside today")).toMatchObject({ tool: "field_work" });
     expect(offlineIntent("show Lahore")).toBeNull();
   });
 });

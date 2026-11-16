@@ -31,6 +31,8 @@ import { AreaChoices } from "../analysis/AreaPrompt";
 import { Figure } from "../ui/Figure";
 import { type WaterHistory as WaterShares, fetchWaterHistory } from "./waterHistory";
 import { type RiskCheck, RISK_SOURCES, riskCheck } from "./risk";
+import { RISES, type RiseResult, riseOverlay } from "./rise";
+import { type Hour, WET_BULB_DANGER, WET_BULB_HEAVY, fetchFieldHours, heatWindows, sprayWindows, windowText } from "./fieldwork";
 import { type SolarProfile, YIELD_FACTOR, fetchSolar } from "./solar";
 import { type CloudHours, type OutlookDay, cleanestWindow, cloudAt, cloudWords, dayName, fetchCloudHours, fetchOutlook, warnings, waterBalance } from "./outlook";
 
@@ -96,6 +98,7 @@ function Overview() {
       <RiskSection lat={lat} lon={lon} />
       <QuickRuns />
       <Outlook lat={lat} lon={lon} />
+      <FieldWork lat={lat} lon={lon} />
       <LandCover />
       <TerrainSection />
       <WaterHistorySection />
@@ -108,6 +111,47 @@ function Overview() {
       <Solar lat={lat} lon={lon} />
       <Nearby lat={lat} lon={lon} />
     </>
+  );
+}
+
+// ---- field work ------------------------------------------------------------------------------
+
+/** When heat makes heavy work unsafe, and when to spray, over the next 48 hours. */
+function FieldWork({ lat, lon }: { lat: number; lon: number }) {
+  const [hours, setHours] = useState<Hour[] | null | undefined>(undefined);
+  useEffect(() => {
+    let stale = false;
+    setHours(undefined);
+    fetchFieldHours(lat, lon).then((h) => { if (!stale) setHours(h.length ? h : null); }, () => { if (!stale) setHours(null); });
+    return () => { stale = true; };
+  }, [lat, lon]);
+  const heat = hours ? heatWindows(hours) : null;
+  const spray = hours ? sprayWindows(hours) : [];
+  return (
+    <section>
+      <header className="row"><h3>Field work, next 48 hours</h3><KindBadge kind="MODELED" /></header>
+      {hours === undefined && <p className="muted" role="status">Reading the hourly forecast…</p>}
+      {hours === null && <p className="note">The hourly forecast could not be read.</p>}
+      {heat && (
+        <>
+          <p>
+            <strong>Heat:</strong>{" "}
+            {heat.danger.length ? <>dangerous for any outdoor work {heat.danger.map(windowText).join(", ")} (wet-bulb up to {heat.maxWetBulb.toFixed(1)} °C). </> : null}
+            {heat.heavy.length ? <>Heavy work needs long rests in the shade {heat.heavy.map(windowText).join(", ")}; do it early or late.</>
+              : <>safe for heavy work at all hours (wet-bulb at most {heat.maxWetBulb.toFixed(1)} °C).</>}
+          </p>
+          <p>
+            <strong>Spraying:</strong>{" "}
+            {spray.length ? <>good windows {spray.slice(0, 3).map(windowText).join("; ")}: a light breeze, dry for the next hours, not too hot.</>
+              : <>no good window: too still, too windy, too hot, or rain due.</>}
+          </p>
+          <p className="muted">
+            Open-Meteo hourly forecast, local time. Earthsift&apos;s rules of thumb: wet-bulb {WET_BULB_HEAVY} °C for heavy work, {WET_BULB_DANGER} °C for any work;
+            full sun adds strain. Spraying: wind 3 to 15 km/h, daylight, 30 °C or less, under 30% chance of rain over three hours. Follow the product label.
+          </p>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -129,7 +173,7 @@ async function shareText(title: string, url: string, text?: string) {
   }
 }
 
-const JUMPS = ["Risk check", "Analyse", "Next 7 days", "Land cover", "Terrain", "Water", "People", "Official", "Rain", "Air", "Climate", "Solar", "Nearby"];
+const JUMPS = ["Risk check", "Analyse", "Next 7 days", "Field work", "Land cover", "Terrain", "Water", "People", "Official", "Rain", "Air", "Climate", "Solar", "Nearby"];
 
 /** The overview is long: one tap scrolls to a section, whose heading starts with the chip's word. */
 function JumpBar() {
@@ -342,6 +386,15 @@ function TerrainSection() {
   const at = (p: [number, number]) => formatLatLon(p[1], p[0]);
   const shown = useStore((s) => s.terrainMap);
   const [drawing, setDrawing] = useState(false);
+  const [rise, setRise] = useState<{ m: number; result: RiseResult } | null>(null);
+  const showRise = (m: number) => {
+    if (shown?.kind === "rise" && rise?.m === m) { useStore.getState().set({ terrainMap: null }); setRise(null); return; }
+    setDrawing(true);
+    riseOverlay(aoi.geometry, m).then(
+      ({ overlay, result }) => { useStore.getState().set({ terrainMap: { kind: "rise", overlay } }); setRise({ m, result }); },
+      () => setError("The flood scenario could not be drawn."),
+    ).finally(() => setDrawing(false));
+  };
   const showMap = (kind: TerrainKind | null) => {
     if (!kind || shown?.kind === kind) { useStore.getState().set({ terrainMap: null }); return; }
     setDrawing(true);
@@ -382,6 +435,20 @@ function TerrainSection() {
             {shown && ("classes" in shown.overlay.legend
               ? <ul className="legend-classes">{shown.overlay.legend.classes.map((c) => <li key={c.label}><span className="swatch" style={{ background: c.color }} aria-hidden="true" /> {c.label}</li>)}</ul>
               : <LegendBar min={shown.overlay.legend.min} max={shown.overlay.legend.max} colors={shown.overlay.legend.colors} label={shown.overlay.legend.unit ?? ""} />)}
+          </div>
+          <div className="field">
+            <span>If the river rises</span>
+            <div className="seg" role="group" aria-label="Water rising above the lowest ground">
+              {RISES.map((m) => (
+                <button key={m} aria-pressed={shown?.kind === "rise" && rise?.m === m} className={shown?.kind === "rise" && rise?.m === m ? "on" : ""} disabled={drawing} onClick={() => showRise(m)}>+{m} m</button>
+              ))}
+            </div>
+            {shown?.kind === "rise" && rise && (
+              <p>
+                Water {rise.m} m above the lowest ground ({metres(rise.result.base)}) would reach <strong>{Math.round(rise.result.share * 100)}%</strong> of
+                the area, about {Math.round(rise.result.ha).toLocaleString("en")} ha, shown in blue. Low ground cut off by higher ground stays dry.
+              </p>
+            )}
           </div>
           <p className="muted">
             Lowest point {at(terrain.lowest)}, highest {at(terrain.highest)}.

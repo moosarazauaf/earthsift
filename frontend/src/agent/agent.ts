@@ -30,6 +30,8 @@ import { getGlobe } from "../globe/GlobeViewer";
 import { isS1Script, lintGeeScript } from "./geeLint";
 import { fetchOutlook, warnings } from "../area/outlook";
 import { RISK_SOURCES, riskCheck } from "../area/risk";
+import { riseOverlay } from "../area/rise";
+import { fetchFieldHours, heatWindows, sprayWindows, windowText } from "../area/fieldwork";
 import { type Finding, checkFloodPlan } from "./s1checks";
 import { KINDS, abilitiesText, toolNamesFor, askFromArgs, asksAbilities, floodDates, honest, num, offlineIntent, placeFromText, str, trimHistory } from "./args";
 
@@ -155,6 +157,22 @@ export const TOOLS = [
       name: "risk_check",
       description: "Is a place safe to build, buy, farm or visit? Rates flooding (water seen since 1984), landslides (slope) and the next 7 days (rain, heat, frost, gales, air), and finds the nearest higher ground for flood-prone places. Omit place to use the area already open.",
       parameters: { type: "object", properties: { place: { type: "string" }, size_km: { type: "number" } } },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "flood_rise",
+      description: "Preparedness scenario: which ground floods if the river or water rises by some metres above the area's lowest ground. Draws it on the map. Omit place to use the area already open.",
+      parameters: { type: "object", properties: { metres: { type: "number", description: "Rise in metres, 0.5 to 20." }, place: { type: "string" }, size_km: { type: "number" } }, required: ["metres"] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "field_work",
+      description: "For farmers and outdoor workers, the next 48 hours: when heat makes heavy work unsafe (wet-bulb temperature) and the best windows to spray crops. Omit place to use the area already open.",
+      parameters: { type: "object", properties: { place: { type: "string" } } },
     },
   },
   {
@@ -475,6 +493,42 @@ async function riskCheckTool(a: Record<string, unknown>): Promise<ToolResult> {
   };
 }
 
+async function floodRise(a: Record<string, unknown>): Promise<ToolResult> {
+  const m = num(a.metres, 0.5, 20);
+  if (m === null) return failed("How many metres? Give a rise between 0.5 and 20 m.");
+  const area = await areaFor(a);
+  if (typeof area === "string") return failed(area);
+  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  const { overlay, result } = await riseOverlay(area.geometry, m);
+  useStore.getState().set({ terrainMap: { kind: "rise", overlay } });
+  const ha = Math.round(result.ha).toLocaleString("en");
+  return {
+    result: JSON.stringify({ area: area.label, rise_m: m, share: result.share, ha: result.ha, base_m: result.base }),
+    say: `If the water in ${area.label} rose ${m} m above the lowest ground (${Math.round(result.base)} m), it would reach ${Math.round(result.share * 100)}% of the area, about ${ha} ha. It is shown in blue on the map.`,
+    card: { kind: "facts", title: `If the water rises ${m} m, ${area.label}`, lines: [`Starting level: the area's lowest ground, ${Math.round(result.base)} m above sea level`, `Reached: ${Math.round(result.share * 100)}% of the area, about ${ha} ha`, "Water spreads only to connected low ground; flows, drains and embankments narrower than the ~30 m height data are not modelled. A scenario, not a forecast."], findings: [] },
+    next: [`If the water rises ${m >= 5 ? 1 : m + 2} m`, "Is this place safe?", "How many people live here?"],
+  };
+}
+
+async function fieldWork(a: Record<string, unknown>): Promise<ToolResult> {
+  const area = await areaFor(a);
+  if (typeof area === "string") return failed(area);
+  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  const [w, s, e, n] = geometryBounds(area.geometry);
+  const hours = await fetchFieldHours((s + n) / 2, (w + e) / 2);
+  if (!hours.length) return failed("The hourly forecast could not be read. Try again in a moment.");
+  const heat = heatWindows(hours), spray = sprayWindows(hours);
+  const heatLine = heat.danger.length ? `Dangerous heat for any outdoor work ${heat.danger.map(windowText).join(", ")}.`
+    : heat.heavy.length ? `Heavy work needs long rests ${heat.heavy.map(windowText).join(", ")}.` : `Safe for heavy work at all hours (wet-bulb at most ${heat.maxWetBulb.toFixed(1)} °C).`;
+  const sprayLine = spray.length ? `Spray ${spray.slice(0, 3).map(windowText).join("; ")}.` : "No good spraying window in the next 48 hours.";
+  return {
+    result: JSON.stringify({ area: area.label, heat: heatLine, spray: sprayLine }),
+    say: `Next 48 hours in ${area.label}: ${heatLine} ${sprayLine}`,
+    card: { kind: "facts", title: `Field work, ${area.label}`, lines: [heatLine, sprayLine, "Open-Meteo hourly forecast, local time. Rules of thumb: wet-bulb 27 °C for heavy work, 30 °C for any work; spraying in wind 3 to 15 km/h, daylight, 30 °C or less, dry for three hours. Follow the product label."], findings: heat.danger.length ? [{ level: "error", text: heatLine }] : heat.heavy.length ? [{ level: "warn", text: heatLine }] : [] },
+    next: ["Is this place safe?", "What is the weather outlook here?", "Land cover here"],
+  };
+}
+
 async function measureArea(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
@@ -540,6 +594,8 @@ export async function runTool(name: string, rawArgs: string, userText: string): 
       case "buffer": return await buffer(a);
       case "terrain": return await terrain(a);
       case "risk_check": return await riskCheckTool(a);
+      case "flood_rise": return await floodRise(a);
+      case "field_work": return await fieldWork(a);
       case "measure_area": return await measureArea(a);
       case "export_area": return exportArea(a);
       case "check_earth_engine_script": return checkScript(str(a.code, 20_000) ?? "");
