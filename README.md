@@ -74,6 +74,22 @@ distance and elevation profile. Nowshera: flooding high, higher ground 1.5 km
 north and 15 m up. **Share this risk check** sends the verdicts as text with a
 link, through the phone's share sheet (WhatsApp, SMS) or the clipboard.
 
+### 🌊 If the river rises
+In the Terrain section of any area, or by asking Sentri (*"what floods if the
+river rises 3 m?"*): choose **+1 m**, **+2 m** or **+5 m** and see which ground
+floods first, in blue on the map, with the share of the area and hectares.
+Water spreads from the area's lowest ground only to connected ground below
+the risen level, so a low field behind a ridge or embankment stays dry.
+Nowshera, 10 km: 5% at +1 m, 8% at +2 m, 20% at +5 m, along the Kabul River.
+A scenario for planning where to move people and stores, not a forecast.
+
+### 🧑‍🌾 Field work, next 48 hours
+For farmers and anyone working outdoors: the hours when **heat** makes heavy
+work unsafe, from the wet-bulb temperature (heat and humidity together), and
+the best **windows to spray crops**: a light breeze, daylight, not too hot, and
+no rain due for three hours. In the area overview, or ask Sentri *"when can I
+spray in Okara?"*.
+
 ### 💬 Ask in plain words
 Type a request in the search box, such as *"floods in Layyah in August
 2022"*, *"how much has Lake Urmia shrunk since 2000"* or *"is Lahore

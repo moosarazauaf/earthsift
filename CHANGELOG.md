@@ -5,6 +5,20 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.42] - 2026-11-16
+
+### Added
+- **If the river rises** 1, 2 or 5 m (Terrain section of the area overview,
+  or ask Sentri): water spreads from the area's lowest ground to connected
+  ground below the risen level, drawn in blue with its share and hectares.
+  Low ground cut off by higher ground stays dry. A preparedness scenario,
+  not a forecast.
+- **Field work, next 48 hours**: the hours too hot for heavy outdoor work
+  (wet-bulb temperature, rules of thumb 27 °C and 30 °C) and the daylight
+  windows to spray crops (wind 3 to 15 km/h, dry for three hours, 30 °C or
+  less), from Open-Meteo's hourly forecast. Also from Sentri ("when can I
+  spray in Okara?").
+
 ## [0.2.0-alpha.41] - 2026-11-15
 
 ### Added
