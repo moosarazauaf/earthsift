@@ -48,7 +48,8 @@ export function honest(text: string, cards: { kind: string; findings: { level: s
 export const CAN_RUN = [
   "Flood mapping with Sentinel-1 radar (2014 on), checked for mixed orbits and compositing before it runs",
   "Burn scars, vegetation change, surface water through the years, urban growth, tree cover loss, land surface temperature and index time series",
-  "If the river rises 1, 2 or 5 m: which ground floods first, drawn on the map",
+  "Compare two places side by side: flood and landslide risk, people, land cover, climate and solar power",
+  "If the river rises 1, 2 or 5 m: which ground floods first and how many people live there, drawn on the map",
   "Field work for the next 48 hours: hours too hot for heavy work, and windows to spray crops",
   "Risk check of any place: flooding since 1984, landslide-prone slopes, the next 7 days and the nearest higher ground",
   "Area overview of any place: 7-day forecast and warnings, air quality, solar power, water since 1984, climate, terrain, people and satellite passes",
@@ -90,7 +91,7 @@ export function placeFromText(text: string): string {
 }
 
 /** Without a model: land cover and carbon requests, with the place after "of", "in" or "for" ("here" means the open area). */
-type OfflineTool = "land_cover" | "carbon_stock" | "people_count" | "save_map" | "time_lapse" | "buffer" | "terrain" | "measure_area" | "export_area" | "risk_check" | "show_layers" | "flood_rise" | "field_work";
+type OfflineTool = "land_cover" | "carbon_stock" | "people_count" | "save_map" | "time_lapse" | "buffer" | "terrain" | "measure_area" | "export_area" | "risk_check" | "show_layers" | "flood_rise" | "field_work" | "compare_places";
 const HERE = /^(here|there|this|it|the same place|this area|this view)$/i;
 const placeAfter = (text: string): string | null => {
   const m = /\b(?:of|in|for|at|around)\s+(.+?)[.?!]*$/i.exec(text.trim());
@@ -121,6 +122,8 @@ export function layerIntent(text: string): Record<string, unknown> | null {
 
 export function offlineIntent(text: string): { tool: OfflineTool; place: string | null; args?: Record<string, unknown> } | null {
   const layers = layerIntent(text);
+  const pair = /\bcompare\s+(.+?)\s+(?:and|with|to|vs\.?|versus)\s+(.+?)[.?!]*$/i.exec(text.trim()) ?? /^\s*(.+?)\s+(?:vs\.?|versus)\s+(.+?)[.?!]*$/i.exec(text.trim());
+  if (pair) return { tool: "compare_places", place: null, args: { place_a: pair[1]!.trim(), place_b: pair[2]!.trim() } };
   const rise = /\b(?:rises?|rising|goes up|up)\b[^\d]{0,20}([\d.]+)\s*(?:m|metres?|meters?)\b|\b([\d.]+)\s*(?:m|metres?|meters?)\s+(?:rise|higher|flood)/i.exec(text);
   if (rise && /\b(river|water|flood|rises?|rising|sea)\b/i.test(text)) return { tool: "flood_rise", place: placeAfter(text.replace(rise[0], "")), args: { metres: Number(rise[1] ?? rise[2]) } };
   if (/\b(spray(ing)?|field work|outdoor work|work outside|working hours|heat stress|wet[- ]bulb|safe to work)\b/i.test(text)) return { tool: "field_work", place: placeAfter(text) };
@@ -226,7 +229,7 @@ const WORDS: Record<string, RegExp> = {
   people_count: /people|population|inhabitants|live there|live here/i, save_map: /save|image|figure|png|export.*map|print/i,
   time_lapse: /time-?\s?lapse|video|animation/i, buffer: /buffer|around .* km|within/i,
   terrain: /terrain|slope|elevation|height|hillshade|aspect|relief|steep/i, flood_rise: /rises?|rising|metres?|meters?|\d\s?m\b|water level/i,
-  field_work: /spray|field|outdoor|work|heat|wet.?bulb|farm/i, measure_area: /area|perimeter|size|how big|centroid|bounds/i,
+  field_work: /spray|field|outdoor|work|heat|wet.?bulb|farm/i, compare_places: /compare|versus|\bvs\b|better|safer|which (place|city|town)/i, measure_area: /area|perimeter|size|how big|centroid|bounds/i,
   export_area: /geojson|kml|shapefile|qgis|arcgis|export|download/i, check_earth_engine_script: /ee\.|earth engine|script|gee/i,
 };
 export function toolNamesFor(text: string): string[] {

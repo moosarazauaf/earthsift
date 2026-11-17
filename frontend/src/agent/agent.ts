@@ -13,7 +13,8 @@ import type { AoiGeometry, Period } from "../app/types";
 import { modeForRun } from "../app/shareRun";
 import { type Ask, interpret } from "../ask/interpret";
 import { STREET, requestRun } from "../ask/request";
-import { carbonInBrowser, deviceProfile, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
+import { carbonInBrowser, deviceProfile, exposureInBrowser, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
+import { compareLines, readPlace, verdict } from "../area/compare";
 import { formatPeople } from "../engine/population";
 import { saveFigure } from "../ui/saveFigure";
 import { downloadText } from "../analysis/download";
@@ -165,6 +166,14 @@ export const TOOLS = [
       name: "flood_rise",
       description: "Preparedness scenario: which ground floods if the river or water rises by some metres above the area's lowest ground. Draws it on the map. Omit place to use the area already open.",
       parameters: { type: "object", properties: { metres: { type: "number", description: "Rise in metres, 0.5 to 20." }, place: { type: "string" }, size_km: { type: "number" } }, required: ["metres"] },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "compare_places",
+      description: "Compare two places side by side: flooding since 1984, landslide-prone slopes, the next 7 days, people, land cover, rain, the hottest month and solar power. For choosing where to buy, build or settle.",
+      parameters: { type: "object", properties: { place_a: { type: "string" }, place_b: { type: "string" }, size_km: { type: "number" } }, required: ["place_a", "place_b"] },
     },
   },
   {
@@ -499,14 +508,50 @@ async function floodRise(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
   useStore.getState().set({ mode: "area", introOpen: false, result: null });
-  const { overlay, result } = await riseOverlay(area.geometry, m);
+  const { overlay, result, raster } = await riseOverlay(area.geometry, m);
   useStore.getState().set({ terrainMap: { kind: "rise", overlay } });
   const ha = Math.round(result.ha).toLocaleString("en");
+  const people = await exposureInBrowser({ aoi: area.geometry, raster, equals: 1 }).promise.then((x) => x.people, () => null);
+  const who = people === null ? "" : people >= 1 ? ` ${formatPeople(people).replace(/^a/, "A")} live on that ground.` : " Almost no one lives on that ground.";
   return {
     result: JSON.stringify({ area: area.label, rise_m: m, share: result.share, ha: result.ha, base_m: result.base }),
-    say: `If the water in ${area.label} rose ${m} m above the lowest ground (${Math.round(result.base)} m), it would reach ${Math.round(result.share * 100)}% of the area, about ${ha} ha. It is shown in blue on the map.`,
-    card: { kind: "facts", title: `If the water rises ${m} m, ${area.label}`, lines: [`Starting level: the area's lowest ground, ${Math.round(result.base)} m above sea level`, `Reached: ${Math.round(result.share * 100)}% of the area, about ${ha} ha`, "Water spreads only to connected low ground; flows, drains and embankments narrower than the ~30 m height data are not modelled. A scenario, not a forecast."], findings: [] },
+    say: `If the water in ${area.label} rose ${m} m above the lowest ground (${Math.round(result.base)} m), it would reach ${Math.round(result.share * 100)}% of the area, about ${ha} ha.${who} It is shown in blue on the map.`,
+    card: { kind: "facts", title: `If the water rises ${m} m, ${area.label}`, lines: [`Starting level: the area's lowest ground, ${Math.round(result.base)} m above sea level`, `Reached: ${Math.round(result.share * 100)}% of the area, about ${ha} ha`, ...(people === null ? [] : [`People on that ground: ${people >= 1 ? formatPeople(people) : "almost none"} (GHS-POP 2020)`]), "Water spreads only to connected low ground; flows, drains and embankments narrower than the ~30 m height data are not modelled. A scenario, not a forecast."], findings: [] },
     next: [`If the water rises ${m >= 5 ? 1 : m + 2} m`, "Is this place safe?", "How many people live here?"],
+  };
+}
+
+/** A place as a square area, without opening it: the comparison reads two at once. */
+async function placeArea(place: string | null, km: number): Promise<{ geometry: AoiGeometry; label: string } | string> {
+  if (!place) return "Name both places, for example \"compare Lahore and Islamabad\".";
+  const { results } = await api.geocode(place);
+  const found = results.find((r) => !STREET.test(r.kind)) ?? results[0];
+  if (!found) return `No place called "${place}" was found. Try adding the country.`;
+  return { geometry: squareAround(found.lon, found.lat, km), label: found.name.split(",")[0]!.trim() };
+}
+
+async function comparePlaces(a: Record<string, unknown>): Promise<ToolResult> {
+  const km = num(a.size_km, 2, 25) ?? 10;
+  const [pa, pb] = await Promise.all([placeArea(str(a.place_a, 120), km), placeArea(str(a.place_b, 120), km)]);
+  if (typeof pa === "string") return failed(pa);
+  if (typeof pb === "string") return failed(pb);
+  // One place at a time: both at once fire a dozen weather requests together, and the free API refuses some.
+  const fa = await readPlace(pa.geometry, pa.label);
+  const fb = await readPlace(pb.geometry, pb.label);
+  const [w1, s1, e1, n1] = geometryBounds(pa.geometry), [w2, s2, e2, n2] = geometryBounds(pb.geometry);
+  void getGlobe()?.flyToBounds([Math.min(w1, w2), Math.min(s1, s2), Math.max(e1, e2), Math.max(n1, n2)]);
+  const lines = compareLines(fa, fb);
+  const sayFirst = verdict(fa, fb);
+  return {
+    result: JSON.stringify({ a: pa.label, b: pb.label, lines }),
+    say: `${sayFirst} Side by side below, each a ${km} km square around its centre.`,
+    card: {
+      kind: "facts", title: `${pa.label} and ${pb.label}, side by side`,
+      lines: [...lines, `Each place is a ${km} km square around its centre. Flooding from JRC Global Surface Water 1984 to 2021, slopes from AWS Terrain Tiles, people from GHS-POP 2020, land cover from ESA WorldCover 2021, climate 1991 to 2020 and sunshine 2016 to 2025 from ERA5. A first look, not a survey.`],
+      findings: [],
+      chart: fa.people !== null && fb.people !== null ? { title: `People, ${km} km squares`, unit: "people", bars: [{ label: fa.label, value: fa.people, colour: "#5fd0c5" }, { label: fb.label, value: fb.people, colour: "#a3b18a" }], source: "GHS-POP 2020 (European Commission JRC). Made with Earthsift." } : undefined,
+    },
+    next: [`Is ${pa.label} safe?`, `Is ${pb.label} safe?`, `Land cover of ${pa.label}`],
   };
 }
 
@@ -596,6 +641,7 @@ export async function runTool(name: string, rawArgs: string, userText: string): 
       case "risk_check": return await riskCheckTool(a);
       case "flood_rise": return await floodRise(a);
       case "field_work": return await fieldWork(a);
+      case "compare_places": return await comparePlaces(a);
       case "measure_area": return await measureArea(a);
       case "export_area": return exportArea(a);
       case "check_earth_engine_script": return checkScript(str(a.code, 20_000) ?? "");

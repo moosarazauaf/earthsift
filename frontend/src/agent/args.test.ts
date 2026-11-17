@@ -87,6 +87,8 @@ describe("chat memory and the built-in reader", () => {
     expect(offlineIntent("what floods if the river rises 2 m in Layyah")).toEqual({ tool: "flood_rise", place: "Layyah", args: { metres: 2 } });
     expect(offlineIntent("5 m flood here")).toEqual({ tool: "flood_rise", place: null, args: { metres: 5 } });
     expect(offlineIntent("when can I spray in Okara?")).toEqual({ tool: "field_work", place: "Okara" });
+    expect(offlineIntent("compare Lahore, Pakistan and Islamabad, Pakistan")).toEqual({ tool: "compare_places", place: null, args: { place_a: "Lahore, Pakistan", place_b: "Islamabad, Pakistan" } });
+    expect(offlineIntent("Sukkur vs Hyderabad?")).toEqual({ tool: "compare_places", place: null, args: { place_a: "Sukkur", place_b: "Hyderabad" } });
     expect(offlineIntent("is it safe to work outside today")).toMatchObject({ tool: "field_work" });
     expect(offlineIntent("show Lahore")).toBeNull();
   });

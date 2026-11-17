@@ -31,6 +31,7 @@ export function utmEpsg(lon: number, lat: number): number {
 /** proj4 definition for a WGS84 UTM EPSG code or for EPSG:4326. */
 export function projDef(epsg: number): string {
   if (epsg === 4326) return "+proj=longlat +datum=WGS84 +no_defs";
+  if (epsg === 3857) return "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +no_defs";
   const south = epsg >= 32700;
   const zone = epsg - (south ? 32700 : 32600);
   if (zone < 1 || zone > 60) throw new Error(`Unsupported coordinate system EPSG:${epsg}`);

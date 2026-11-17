@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { atLink, formatArea, formatLatLon } from "../app/logic";
 import { useStore } from "../app/store";
-import { deviceProfile, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
+import { deviceProfile, exposureInBrowser, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
 import { type PopulationResult, formatPeople } from "../engine/population";
 import { type CountryFacts, type FoodSecurity, type RainAnomaly, fetchCountryFacts, fetchFoodSecurity, fetchRainAnomaly } from "./official";
 import { type District, districtAt } from "./districts";
@@ -386,12 +386,17 @@ function TerrainSection() {
   const at = (p: [number, number]) => formatLatLon(p[1], p[0]);
   const shown = useStore((s) => s.terrainMap);
   const [drawing, setDrawing] = useState(false);
-  const [rise, setRise] = useState<{ m: number; result: RiseResult } | null>(null);
+  const [rise, setRise] = useState<{ m: number; result: RiseResult; people?: number | null } | null>(null);
   const showRise = (m: number) => {
     if (shown?.kind === "rise" && rise?.m === m) { useStore.getState().set({ terrainMap: null }); setRise(null); return; }
     setDrawing(true);
     riseOverlay(aoi.geometry, m).then(
-      ({ overlay, result }) => { useStore.getState().set({ terrainMap: { kind: "rise", overlay } }); setRise({ m, result }); },
+      ({ overlay, result, raster }) => {
+        useStore.getState().set({ terrainMap: { kind: "rise", overlay } });
+        setRise({ m, result });
+        exposureInBrowser({ aoi: aoi.geometry, raster, equals: 1 }).promise.then(
+          (x) => setRise((r) => (r && r.m === m ? { ...r, people: x.people } : r)), () => setRise((r) => (r && r.m === m ? { ...r, people: null } : r)));
+      },
       () => setError("The flood scenario could not be drawn."),
     ).finally(() => setDrawing(false));
   };
@@ -446,7 +451,9 @@ function TerrainSection() {
             {shown?.kind === "rise" && rise && (
               <p>
                 Water {rise.m} m above the lowest ground ({metres(rise.result.base)}) would reach <strong>{Math.round(rise.result.share * 100)}%</strong> of
-                the area, about {Math.round(rise.result.ha).toLocaleString("en")} ha, shown in blue. Low ground cut off by higher ground stays dry.
+                the area, about {Math.round(rise.result.ha).toLocaleString("en")} ha, shown in blue.{" "}
+                {rise.people === undefined ? "Counting the people who live there…" : rise.people === null ? "" : rise.people >= 1 ? <><strong>{formatPeople(rise.people).replace(/^a/, "A")}</strong> live on that ground (GHS-POP 2020).</> : "Almost no one lives on that ground."}{" "}
+                Low ground cut off by higher ground stays dry.
               </p>
             )}
           </div>

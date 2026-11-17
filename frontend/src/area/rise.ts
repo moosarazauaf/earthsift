@@ -64,7 +64,15 @@ export function riseMask(g: Pick<HeightGrid, "heights" | "width" | "height" | "x
   return { mask, base, share: reached / all, ha: m2 / 10_000 };
 }
 
-export async function riseOverlay(aoi: AoiGeometry, rise: number, signal?: AbortSignal): Promise<{ overlay: Overlay; result: RiseResult }> {
+const WORLD_M = 40_075_016.686;
+
+/** The scenario's mask as a web-mercator raster, for counting the people who live on the flooded ground. */
+export function riseRaster(g: Pick<HeightGrid, "width" | "height" | "x0" | "y0" | "z">, mask: Uint8Array) {
+  const cell = WORLD_M / (TILE * 2 ** g.z);
+  return { data: mask, epsg: 3857, west: (g.x0 / 2 ** g.z) * WORLD_M - WORLD_M / 2, north: WORLD_M / 2 - (g.y0 / 2 ** g.z) * WORLD_M, res: cell, width: g.width, height: g.height };
+}
+
+export async function riseOverlay(aoi: AoiGeometry, rise: number, signal?: AbortSignal): Promise<{ overlay: Overlay; result: RiseResult; raster: ReturnType<typeof riseRaster> }> {
   const g = await fetchHeights(aoi, signal);
   const result = riseMask(g, rise);
   if (!result) throw new Error("No elevation inside this area.");
@@ -77,6 +85,7 @@ export async function riseOverlay(aoi: AoiGeometry, rise: number, signal?: Abort
   const lon = (x: number) => (x / 2 ** g.z) * 360 - 180;
   return {
     result,
+    raster: riseRaster(g, result.mask),
     overlay: {
       title: `If the water rises ${rise} m above the lowest ground (${Math.round(result.base)} m), AWS Terrain Tiles`,
       url: URL.createObjectURL(blob),
