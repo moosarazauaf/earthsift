@@ -81,7 +81,17 @@ floods first, in blue on the map, with the share of the area and hectares.
 Water spreads from the area's lowest ground only to connected ground below
 the risen level, so a low field behind a ridge or embankment stays dry.
 Nowshera, 10 km: 5% at +1 m, 8% at +2 m, 20% at +5 m, along the Kabul River.
-A scenario for planning where to move people and stores, not a forecast.
+It also counts the people living on that ground (GHS-POP 2020): about
+3,240 at +3 m. A scenario for planning where to move people and stores, not a
+forecast.
+
+### ⚖️ Compare two places
+Ask Sentri *"compare Lahore and Islamabad"* or *"Sukkur vs Murree"* and get
+both side by side: flooding since 1984, landslide-prone slopes, the next 7
+days, people, land cover, rain in an average year, the hottest month and solar
+power, with a plain verdict first (*"Islamabad is the safer ground: Lahore has
+more flooding risk"*, or *"Different risks: Sukkur's is flooding, Murree's is
+landslides"*). For choosing where to buy, build, settle or put a project.
 
 ### 🧑‍🌾 Field work, next 48 hours
 For farmers and anyone working outdoors: the hours when **heat** makes heavy

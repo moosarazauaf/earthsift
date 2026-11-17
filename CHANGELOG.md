@@ -5,6 +5,22 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.43] - 2026-11-17
+
+### Added
+- **Compare two places** (ask Sentri "compare Lahore and Islamabad", or
+  "Sukkur vs Murree"): flooding since 1984, landslide-prone slopes, the next
+  7 days, people, land cover, rain, the hottest month and solar power side by
+  side, with a plain verdict and a chart. For choosing where to buy, build
+  or settle.
+- **People in a flood scenario**: "If the river rises" now counts the people
+  living on the ground that floods (GHS-POP 2020). Nowshera, 10 km, +3 m:
+  about 3,240 people.
+
+### Fixed
+- **People counts failed everywhere** ("Error fetching data."): the GHS-POP
+  2020 file moved one folder up on Source Cooperative.
+
 ## [0.2.0-alpha.42] - 2026-11-16
 
 ### Added
