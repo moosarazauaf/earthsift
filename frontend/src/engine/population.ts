@@ -13,7 +13,7 @@ import { contains } from "../area/districts";
 import type { EngineHooks } from "./common";
 import { projectAoi, transformer } from "./geo";
 
-const URL = "https://data.source.coop/cboettig/population/raw/ghs-pop-2020-cog.tif";
+const URL = "https://data.source.coop/cboettig/population/ghs-pop-2020-cog.tif";
 /** Cells read at most; above this the next coarser overview is used. */
 const MAX_CELLS = 1_000_000;
 
