@@ -41,6 +41,8 @@ export type DrawTool = "none" | "rectangle" | "polygon" | "point" | "measure" | 
 /** Name of a result raster, as keyed in the result's `overlays`. */
 export type OverlayKey = string;
 
+export type AreaTab = "summary" | "land" | "people" | "weather" | "analyse";
+
 export interface Aoi {
   geometry: AoiGeometry;
   label: string;
@@ -174,6 +176,10 @@ interface State {
   agentOpen: boolean;
   /** A question put into Sentri's box from elsewhere (the opening screen); sent at once when `send`. */
   agentDraft: { text: string; send: boolean } | null;
+  /** A click on empty ground: the "What's here?" card. */
+  whatsHere: { lon: number; lat: number } | null;
+  /** The area overview's open tab. */
+  areaTab: AreaTab;
   /** A time-lapse video being recorded: years done, how many, and the one on screen. */
   timelapse: { done: number; total: number; year: number } | null;
   /** Start a one-click analysis of the current area. */
@@ -364,7 +370,7 @@ export const useStore = create<State>((set, get) => {
     // Any other way of setting the area is not "around a point", so the size chips and centre go.
     // A new area also picks the imagery that suits its size; the Layers panel can still switch it.
     areaPeople: null,
-    setAoi: (aoi) => set({ aoi, drawTool: "none", areaCover: null, terrainMap: null, areaSteepShare: null, areaPeople: null, pickCentre: null, ...(aoi ? { preferredDataset: datasetForArea(aoi.geometry) } : {}) }),
+    setAoi: (aoi) => set({ aoi, areaTab: "summary", drawTool: "none", areaCover: null, terrainMap: null, areaSteepShare: null, areaPeople: null, pickCentre: null, ...(aoi ? { preferredDataset: datasetForArea(aoi.geometry) } : {}) }),
     measure: [],
     drawnSamples: [],
     sampleClass: "",
@@ -373,6 +379,8 @@ export const useStore = create<State>((set, get) => {
     placesOpen: false,
     agentOpen: false,
     agentDraft: null,
+    whatsHere: null,
+    areaTab: "summary",
     timelapse: null,
     saveCurrentPlace: () => {
       const aoi = get().aoi;
@@ -397,7 +405,7 @@ export const useStore = create<State>((set, get) => {
       get().cancelJob(); // a run for the previous area must not land on this one
       set({
         aoi: { geometry: squareAround(lon, lat, km), label }, pickCentre: [lon, lat], pickSizeKm: km,
-        drawTool: "none", mode: "area", areaCover: null, terrainMap: null, areaSteepShare: null, introOpen: false, result: null,
+        drawTool: "none", mode: "area", areaCover: null, terrainMap: null, areaSteepShare: null, introOpen: false, result: null, areaTab: "summary", whatsHere: null,
       });
       // Name the place when OpenStreetMap knows it; the coordinates stay if it does not answer.
       void reverseGeocode(lat, lon).then((name) => {
@@ -473,7 +481,7 @@ function remember(recent: RecentRun[], result: AnalysisResult): RecentRun[] {
 const NOMINATIM_REVERSE = "https://nominatim.openstreetmap.org/reverse";
 
 /** The nearest named place to a point, from OpenStreetMap; null if none or the service is busy. */
-async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
   try {
     const response = await fetch(`${NOMINATIM_REVERSE}?format=jsonv2&zoom=10&accept-language=en&lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`);
     if (!response.ok) return null;

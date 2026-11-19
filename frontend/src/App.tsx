@@ -20,6 +20,7 @@ import { PanelBoundary } from "./ui/PanelBoundary";
 import { useWatchOnStart } from "./area/watch";
 import { ShortcutsCard, useShortcuts } from "./ui/Shortcuts";
 import { TopBar } from "./ui/TopBar";
+import { WhatsHere } from "./ui/WhatsHere";
 import { LegalPages } from "./ui/Legal";
 
 /** Restore a shared view or analysis from the address bar. */
@@ -76,6 +77,7 @@ export function App() {
       <SharedRunCard />
       <DistrictCard />
       <QuakeCard />
+      <WhatsHere />
       <Readout />
       <StoryCaption />
       <Notice />

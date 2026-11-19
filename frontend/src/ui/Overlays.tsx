@@ -60,7 +60,7 @@ export function Intro() {
             ))}
           </div>
           <p className="examples">
-            <button className="link" onClick={close}>Just explore the globe since 1984</button>
+            <button className="link" onClick={close}>Just explore: click any place on the globe to see what is there</button>
             {" · "}
             <button className="link" onClick={() => setStep("analyse")}>Choose an analysis yourself</button>
           </p>

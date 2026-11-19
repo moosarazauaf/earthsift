@@ -11,6 +11,7 @@ import { ANALYSES, type AnalysisMode } from "./modes";
 import { useT } from "../i18n";
 import { useWatchedPlaces } from "../area/watch";
 import { modeForRun } from "../app/shareRun";
+import { looksLikeRequest } from "../agent/args";
 import { interpret } from "../ask/interpret";
 import { requestRun } from "../ask/request";
 import { districtAt } from "../area/districts";
@@ -124,6 +125,14 @@ export function TopBar() {
       void getGlobe()?.flyTo(point.lon, point.lat, COORDINATE_VIEW_HEIGHT_M);
       return;
     }
+    // One box for everything: a question or request goes to Sentri, which plans analyses and runs the tools; a bare name is searched here.
+    if (looksLikeRequest(query.trim())) {
+      setPlaces(null);
+      setMessage(null);
+      useStore.getState().set({ agentOpen: true, introOpen: false, agentDraft: { text: query.trim(), send: true } });
+      setQuery("");
+      return;
+    }
     setBusy(true);
     setMessage(null);
     // A request that names an analysis ("floods in Layyah in August 2022") is planned and shown for confirmation.
@@ -216,11 +225,6 @@ export function TopBar() {
         )}
       </form>
 
-      <button className={drawTool === "point" ? "ghost pick on" : "ghost pick"} aria-pressed={drawTool === "point"}
-        onClick={() => set({ drawTool: drawTool === "point" ? "none" : "point", introOpen: false })}
-        title={t("top.analyseHereTitle")}>
-        <span aria-hidden="true">◎</span><span className="label"> {t("top.analyseHere")}</span>
-      </button>
       <button className={drawTool === "measure" ? "ghost measure-btn on" : "ghost measure-btn"} aria-pressed={drawTool === "measure"}
         onClick={() => set(drawTool === "measure" ? { drawTool: "none" } : { drawTool: "measure", measure: [], introOpen: false })}
         title="Measure a distance or an area (D)" aria-label="Measure">

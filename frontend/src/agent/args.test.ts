@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { askFromArgs, floodDates, honest } from "./args";
+import { askFromArgs, floodDates, honest, looksLikeRequest } from "./args";
 
 const now = new Date("2026-11-05T00:00:00Z");
 
@@ -118,5 +118,12 @@ describe("example questions", () => {
     expect(pickExamples(4, fixed)).not.toEqual(pickExamples(4, fixed));
     expect(EXAMPLE_POOL.length).toBeGreaterThan(30);
     void b;
+  });
+});
+
+describe("the one search box", () => {
+  it("sends questions and requests to Sentri and keeps bare place names as searches", () => {
+    for (const q of ["Is Sukkur safe?", "compare Lahore and Karachi", "floods in Layyah August 2022", "carbon stock of Changa Manga", "buffer 2 km", "Sukkur vs Murree", "show wind"]) expect(looksLikeRequest(q)).toBe(true);
+    for (const q of ["Lahore", "Nowshera, Pakistan", "Mangla Reservoir", "Swat District"]) expect(looksLikeRequest(q)).toBe(false);
   });
 });

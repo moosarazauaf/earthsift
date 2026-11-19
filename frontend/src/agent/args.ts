@@ -1,5 +1,6 @@
 /** The model's tool arguments, checked before use: anything out of range is dropped, not trusted. */
 import type { Ask, AskKind } from "../ask/interpret";
+import { interpret } from "../ask/interpret";
 import type { Message } from "./agent";
 
 export const KINDS: AskKind[] = ["flood", "burn", "vegetation", "water", "urban", "trees", "heat", "series"];
@@ -237,5 +238,13 @@ export function toolNamesFor(text: string): string[] {
   // Fill unused places with the most asked-for extras.
   for (const name of ["land_cover", "terrain", "carbon_stock", "people_count"]) if (!picked.includes(name)) picked.push(name);
   return [...ALWAYS, ...picked].slice(0, MAX_TOOLS);
+}
+
+
+/** A request rather than a place name: a question, a command, or anything the rules or the analysis reader understand. */
+export function looksLikeRequest(text: string): boolean {
+  return /\?\s*$/.test(text) || /^(is|are|has|have|how|what|when|where|which|why|can|should|show|make|map|compare|buffer|export|save|turn|find|measure|count)\b/i.test(text)
+    || /\b(vs\.?|versus|safe|risk|flood(s|ed|ing)?|carbon|land cover|slope|hillshade|time-?lapse|spray|people live|rises?)\b/i.test(text)
+    || offlineIntent(text) !== null || interpret(text) !== null;
 }
 

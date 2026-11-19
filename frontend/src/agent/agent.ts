@@ -455,7 +455,7 @@ async function buffer(a: Record<string, unknown>): Promise<ToolResult> {
 async function terrain(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
-  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  useStore.getState().set({ mode: "area", introOpen: false, result: null, areaTab: "land" });
   const t = await fetchTerrain(area.geometry);
   if (!t) return failed(`No elevation data inside ${area.label}.`);
   const kind = TERRAIN_KINDS.find((k) => k.id === a.map)?.id as TerrainKind | undefined;
@@ -482,7 +482,7 @@ async function terrain(a: Record<string, unknown>): Promise<ToolResult> {
 async function riskCheckTool(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
-  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  useStore.getState().set({ mode: "area", introOpen: false, result: null, areaTab: "summary" });
   const [w, s, e, n] = geometryBounds(area.geometry);
   const check = await riskCheck(area.geometry, (s + n) / 2, (w + e) / 2);
   if (!check.items.length) return failed(`The risk check could not read any data for ${area.label}. Try again in a moment.`);
@@ -507,7 +507,7 @@ async function floodRise(a: Record<string, unknown>): Promise<ToolResult> {
   if (m === null) return failed("How many metres? Give a rise between 0.5 and 20 m.");
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
-  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  useStore.getState().set({ mode: "area", introOpen: false, result: null, areaTab: "land" });
   const { overlay, result, raster } = await riseOverlay(area.geometry, m);
   useStore.getState().set({ terrainMap: { kind: "rise", overlay } });
   const ha = Math.round(result.ha).toLocaleString("en");
@@ -558,7 +558,7 @@ async function comparePlaces(a: Record<string, unknown>): Promise<ToolResult> {
 async function fieldWork(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
-  useStore.getState().set({ mode: "area", introOpen: false, result: null });
+  useStore.getState().set({ mode: "area", introOpen: false, result: null, areaTab: "weather" });
   const [w, s, e, n] = geometryBounds(area.geometry);
   const hours = await fetchFieldHours((s + n) / 2, (w + e) / 2);
   if (!hours.length) return failed("The hourly forecast could not be read. Try again in a moment.");

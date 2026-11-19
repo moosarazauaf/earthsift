@@ -92,6 +92,11 @@ export function GlobeViewer() {
         else state.analyseAt(lon, lat);
       },
       (points, done) => useStore.getState().set(done ? { measure: points, drawTool: "none" } : { measure: points }),
+      (lon, lat) => {
+        const s = useStore.getState();
+        // Only where the globe is being browsed; analyses use clicks for their own outlines.
+        if (["explore", "live", "area"].includes(s.mode) && !s.selectedStory && !s.selectedAlert) s.set({ whatsHere: { lon, lat }, introOpen: false });
+      },
     );
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {

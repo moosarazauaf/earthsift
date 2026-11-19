@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { atLink, formatArea, formatLatLon } from "../app/logic";
-import { useStore } from "../app/store";
+import { type AreaTab, useStore } from "../app/store";
 import { deviceProfile, exposureInBrowser, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
 import { type PopulationResult, formatPeople } from "../engine/population";
 import { type CountryFacts, type FoodSecurity, type RainAnomaly, fetchCountryFacts, fetchFoodSecurity, fetchRainAnomaly } from "./official";
@@ -69,6 +69,25 @@ function Overview() {
     (projected.lonLatBounds[0] + projected.lonLatBounds[2]) / 2,
     (projected.lonLatBounds[1] + projected.lonLatBounds[3]) / 2,
   ];
+  const tab = useStore((s) => s.areaTab);
+  const set = useStore((s) => s.set);
+  const [visited, setVisited] = useState<Set<AreaTab>>(() => new Set([tab]));
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => setVisited(new Set([useStore.getState().areaTab])), [aoi]);
+  useEffect(() => setVisited((v) => (v.has(tab) ? v : new Set([...v, tab]))), [tab]);
+  const shown = (id: AreaTab) => printing || visited.has(id);
+  // The printed report holds every tab: load them all, wait for their readings (up to 40 s), then print.
+  const printReport = () => {
+    setPrinting(true);
+    const started = Date.now();
+    const wait = () => {
+      const busy = document.querySelector(".panel.right [role=status]");
+      if (busy && Date.now() - started < 40_000) { setTimeout(wait, 1000); return; }
+      window.print();
+      setPrinting(false);
+    };
+    setTimeout(wait, 1500);
+  };
 
   return (
     <>
@@ -77,7 +96,7 @@ function Overview() {
         <h2 className="story-title">{aoi.label}</h2>
         <div className="row-actions">
           <button onClick={saveCurrentPlace} disabled={saved} title="Keep this area in My places, in this browser (Shift+S)">{saved ? t("area.saved") : t("area.save")}</button>
-          <button onClick={() => window.print()} title="Print this overview, or save it as a PDF">{t("area.print")}</button>
+          <button onClick={printReport} disabled={printing} title="Print every part of this overview, or save it as a PDF">{printing ? "Preparing…" : t("area.print")}</button>
           {centre && <button onClick={() => void shareText(aoi.label, overviewLink(centre, size))} title="Send a link that opens this overview">Share</button>}
         </div>
         <p className="muted">
@@ -94,22 +113,50 @@ function Overview() {
           </div>
         )}
       </section>
-      <JumpBar />
-      <RiskSection lat={lat} lon={lon} />
-      <QuickRuns />
-      <Outlook lat={lat} lon={lon} />
-      <FieldWork lat={lat} lon={lon} />
-      <LandCover />
-      <TerrainSection />
-      <WaterHistorySection />
-      <People />
-      <Official lat={lat} lon={lon} />
-      <Passes lat={lat} lon={lon} />
-      <RecentRain lat={lat} lon={lon} />
-      <Air lat={lat} lon={lon} />
-      <Climate lat={lat} lon={lon} />
-      <Solar lat={lat} lon={lon} />
-      <Nearby lat={lat} lon={lon} />
+      <nav className="area-tabs" role="tablist" aria-label="Parts of this overview">
+        {AREA_TABS.map((x) => (
+          <button key={x.id} role="tab" aria-selected={tab === x.id} className={tab === x.id ? "on" : ""} onClick={() => set({ areaTab: x.id })}>
+            {x.label}
+          </button>
+        ))}
+      </nav>
+      {/* A tab loads when first opened and stays loaded; printing loads them all. */}
+      {shown("summary") && (
+        <div hidden={tab !== "summary" && !printing}>
+          <RiskSection lat={lat} lon={lon} />
+          <CompareWith label={aoi.label} />
+          <Outlook lat={lat} lon={lon} />
+          <Nearby lat={lat} lon={lon} />
+        </div>
+      )}
+      {shown("land") && (
+        <div hidden={tab !== "land" && !printing}>
+          <LandCover />
+          <TerrainSection />
+          <WaterHistorySection />
+        </div>
+      )}
+      {shown("people") && (
+        <div hidden={tab !== "people" && !printing}>
+          <People />
+          <Official lat={lat} lon={lon} />
+        </div>
+      )}
+      {shown("weather") && (
+        <div hidden={tab !== "weather" && !printing}>
+          <FieldWork lat={lat} lon={lon} />
+          <RecentRain lat={lat} lon={lon} />
+          <Air lat={lat} lon={lon} />
+          <Climate lat={lat} lon={lon} />
+          <Solar lat={lat} lon={lon} />
+          <Passes lat={lat} lon={lon} />
+        </div>
+      )}
+      {shown("analyse") && (
+        <div hidden={tab !== "analyse" && !printing}>
+          <QuickRuns />
+        </div>
+      )}
     </>
   );
 }
@@ -173,19 +220,20 @@ async function shareText(title: string, url: string, text?: string) {
   }
 }
 
-const JUMPS = ["Risk check", "Analyse", "Next 7 days", "Field work", "Land cover", "Terrain", "Water", "People", "Official", "Rain", "Air", "Climate", "Solar", "Nearby"];
+const AREA_TABS: { id: AreaTab; label: string }[] = [
+  { id: "summary", label: "Summary" }, { id: "land", label: "Land" }, { id: "people", label: "People" },
+  { id: "weather", label: "Weather" }, { id: "analyse", label: "Analyse" },
+];
 
-/** The overview is long: one tap scrolls to a section, whose heading starts with the chip's word. */
-function JumpBar() {
-  const jump = (word: string, el: HTMLElement) => {
-    const panel = el.closest(".panel") ?? document;
-    const h = [...panel.querySelectorAll("h3")].find((x) => x.textContent?.toLowerCase().startsWith(word.toLowerCase()) || (word === "Nearby" && /nearby/i.test(x.textContent ?? "")));
-    h?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+/** Compare this place with another, through Sentri, which reads both with the same code. */
+function CompareWith({ label }: { label: string }) {
+  const set = useStore((s) => s.set);
   return (
-    <nav className="jump-bar" aria-label="Sections of this overview">
-      {JUMPS.map((w) => <button key={w} className="chip" onClick={(e) => jump(w, e.currentTarget)}>{w}</button>)}
-    </nav>
+    <section className="compare-with">
+      <button onClick={() => set({ agentOpen: true, introOpen: false, agentDraft: { text: `compare ${label.replace(/^\d+ km around /, "")} and [place]`, send: false } })}>
+        ⚖️ Compare with another place
+      </button>
+    </section>
   );
 }
 
@@ -227,7 +275,7 @@ function RiskSection({ lat, lon }: { lat: number; lon: number }) {
             const lines = check.items.map((r) => `${r.title}: ${LEVEL_WORD[r.level]}. ${r.text}`);
             void shareText(`Risk check, ${aoi.label}`, overviewLink(c, useStore.getState().pickSizeKm), `Risk check for ${aoi.label} (Earthsift, satellite data):\n${lines.join("\n")}`);
           }}>Share this risk check</button>
-          <p className="muted">{RISK_SOURCES}</p>
+          <details className="sources"><summary>Sources and limits</summary><p className="muted">{RISK_SOURCES}</p></details>
         </>
       )}
     </section>

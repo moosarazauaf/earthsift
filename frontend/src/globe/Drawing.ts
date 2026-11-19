@@ -36,6 +36,7 @@ export class Drawing {
     private onPick: (detectionId: string | null) => void,
     private onPoint: (lon: number, lat: number) => void,
     private onMeasure: (points: LonLat[], done: boolean) => void,
+    private onGround: (lon: number, lat: number) => void = () => {},
   ) {
     const { viewer } = globe;
     this.handler = new ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -92,7 +93,11 @@ export class Drawing {
       const entity = picked?.id instanceof Entity ? picked.id : null;
       // Alert and news markers carry an "alert:" or "news:" id; detection outlines carry a direction.
       const id = entity ? String(entity.id) : null;
-      this.onPick(id && (id.startsWith("alert:") || id.startsWith("news:") || id.startsWith("air:") || id.startsWith("quake:") || entity?.properties?.direction) ? id : null);
+      const known = id && (id.startsWith("alert:") || id.startsWith("news:") || id.startsWith("air:") || id.startsWith("quake:") || entity?.properties?.direction) ? id : null;
+      this.onPick(known);
+      // Empty ground: identify the spot, as a desktop GIS does.
+      const ground = known ? null : this.locate(position);
+      if (ground) this.onGround(ground[0], ground[1]);
       return;
     }
     const point = this.locate(position);
