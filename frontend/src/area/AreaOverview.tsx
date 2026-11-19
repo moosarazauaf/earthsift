@@ -498,7 +498,7 @@ function TerrainSection() {
             </div>
             {shown?.kind === "rise" && rise && (
               <p>
-                Water {rise.m} m above the lowest ground ({metres(rise.result.base)}) would reach <strong>{Math.round(rise.result.share * 100)}%</strong> of
+                Water {rise.m} m above {rise.result.baseFrom === "river" ? "the river" : "the lowest ground"} ({metres(rise.result.base)}) would reach <strong>{Math.round(rise.result.share * 100)}%</strong> of
                 the area, about {Math.round(rise.result.ha).toLocaleString("en")} ha, shown in blue.{" "}
                 {rise.people === undefined ? "Counting the people who live there…" : rise.people === null ? "" : rise.people >= 1 ? <><strong>{formatPeople(rise.people).replace(/^a/, "A")}</strong> live on that ground (GHS-POP 2020).</> : "Almost no one lives on that ground."}{" "}
                 Low ground cut off by higher ground stays dry.

@@ -26,6 +26,19 @@ describe("if the river rises", () => {
     expect(r.share).toBeLessThan(0.3);
   });
 
+  it("starts from the river when permanent water is known, and says so", () => {
+    // The river (column 5) sits at 100 m; a dry pit at column 15 is lower, at 98 m.
+    const h2 = new Float32Array(heights); for (let r = 0; r < w; r++) h2[r * w + 15] = 98;
+    const water = new Uint8Array(w * w); for (let r = 0; r < w; r++) water[r * w + 5] = 1;
+    const fromRiver = riseMask({ ...g, heights: h2 }, 1, water)!;
+    expect(fromRiver.baseFrom).toBe("river");
+    expect(fromRiver.base).toBe(100);
+    // Without the river, the pit would set the level.
+    const lowest = riseMask({ ...g, heights: h2 }, 1)!;
+    expect(lowest.baseFrom).toBe("lowest");
+    expect(lowest.base).toBe(98);
+  });
+
   it("reaches further as the water rises", () => {
     expect(riseMask(g, 5)!.share).toBeGreaterThan(riseMask(g, 1)!.share);
   });
