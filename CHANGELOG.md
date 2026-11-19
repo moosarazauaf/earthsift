@@ -5,6 +5,31 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.44] - 2026-11-19
+
+A redesign after a review against desktop GIS conventions.
+
+### Added
+- **Click to identify**: clicking empty ground opens "What's here?" with the
+  place name, its height and how often it has been under water since 1984,
+  and the next steps: overview, land and terrain, weather and field work,
+  compare.
+- **Compare with another place** button in the overview's Summary.
+
+### Changed
+- The **area overview is in tabs**: Summary, Land, People, Weather, Analyse.
+  A tab loads when first opened, so an overview starts faster and makes far
+  fewer requests at once; Print report loads every tab first.
+- **One search box**: a question or request typed in the top search goes to
+  Sentri; a place name is searched as before.
+- Sentri opens the tab that matches its answer (risk check on Summary, flood
+  scenario on Land, field work on Weather).
+- The risk check's sources fold into "Sources and limits".
+
+### Removed
+- The "Analyse here" button in the top bar: clicking the globe does it now
+  (the A key still works).
+
 ## [0.2.0-alpha.43] - 2026-11-17
 
 ### Added

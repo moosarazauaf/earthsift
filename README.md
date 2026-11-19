@@ -46,6 +46,21 @@ scenes, the method and the limits behind it.
 
 ## What you can do
 
+### 👆 Click anywhere: what's here?
+Click any spot on the globe, as with the Identify tool in a desktop GIS: a
+card names the place, gives its height and how often it has been under water
+since 1984, and offers the next step: **Is it safe? Overview**, **Land and
+terrain**, **Weather and field work**, or **Compare** with another place.
+
+### 🗂️ One place, five tabs
+Every area opens on **Summary** (the risk verdicts, the week ahead and what is
+happening nearby), with **Land** (land cover, terrain, the river-rise scenario,
+water since 1984), **People** (population and official figures), **Weather**
+(field work, rain, air, climate, solar power, satellite passes) and
+**Analyse** (the one-click analyses) a tap away. Each tab loads when you open
+it. The top search box is the same single box for everything: type a place to
+go there, or a question (*"Is Sukkur safe?"*) and Sentri answers it.
+
 ### 🧭 Start from your question
 The opening screen asks *"What do you need to know about a place?"* and
 offers the questions people actually bring: is this land safe to build on or
