@@ -5,6 +5,21 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.46] - 2026-11-19
+
+### Added
+- **Hill torrents** in the risk check: flat ground with land rising 800 m or
+  more within 50 km, where heavy rain in the hills can flood a plain that
+  rivers never reached (Rajanpur, 2022). Rated at most "Some": the rule was
+  set on 14 towns ([docs/VALIDATION.md](docs/VALIDATION.md)).
+- Sentri's risk check shows its measurements: flat share, the rise within
+  50 km and the centre point's water history.
+
+### Rejected after testing
+- Rating the centre point instead of the square (every town's centre read 0%,
+  flooded or not), and flat ground on its own (Faisalabad is the flattest
+  town and did not flood).
+
 ## [0.2.0-alpha.45] - 2026-11-19
 
 ### Changed

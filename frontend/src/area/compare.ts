@@ -55,6 +55,7 @@ export function compareLines(a: PlaceFacts, b: PlaceFacts): string[] {
   const risk = (hazard: RiskItem["hazard"]) => (p: PlaceFacts) => { const r = p.risks.find((x) => x.hazard === hazard); return r ? WORD[r.level] : blank; };
   return [
     `Flooding since 1984: ${pair(risk("flood"))}`,
+    `Hill torrents: ${pair(risk("torrent"))}`,
     `Landslide-prone slopes: ${pair(risk("landslide"))}`,
     `Next 7 days: ${pair(risk("week"))}`,
     `People: ${pair((p) => (p.people === null ? blank : `${formatPeople(p.people).replace("about ", "")} (${Math.round(p.people / Math.max(p.areaKm2, 0.01)).toLocaleString("en")} per km²)`))}`,

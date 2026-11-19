@@ -6,7 +6,9 @@
  * Every rating comes from measured data, with fixed thresholds stated here.
  */
 import type { AoiGeometry } from "../app/types";
-import { type HeightGrid, fetchHeights, latToTileY, lonToTileX, terrainStats, tileYToLat } from "./elevation";
+import { squareAround } from "../app/logic";
+import { pointFacts } from "./identify";
+import { type HeightGrid, fetchHeights, insideRings, latToTileY, lonToTileX, terrainStats, tileYToLat } from "./elevation";
 import { type Warning, fetchOutlook, warnings } from "./outlook";
 import { type WaterHistory, fetchWaterHistory } from "./waterHistory";
 
@@ -15,7 +17,7 @@ const TILE = 256;
 export const RISE_M = 10;
 
 export type Level = "high" | "medium" | "low";
-export interface RiskItem { hazard: "flood" | "landslide" | "week"; level: Level; title: string; text: string }
+export interface RiskItem { hazard: "flood" | "torrent" | "landslide" | "week"; level: Level; title: string; text: string }
 export interface HighGround { lon: number; lat: number; km: number; direction: string; aboveM: number }
 
 const DIRECTIONS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
@@ -56,7 +58,14 @@ const pct = (v: number) => (v > 0 && v < 0.005 ? "under 1%" : `${Math.round(v * 
 const distance = (km: number) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`);
 
 /** The verdicts, from whatever could be read; a missing input leaves its item out. */
-export function rateRisks(input: { water?: WaterHistory | null; steep?: number | null; week?: Warning[]; ground?: HighGround | null; groundSearched?: boolean }): RiskItem[] {
+/**
+ * Hill torrents: flat ground with mountains close by, which send flash floods onto the plain in heavy rain
+ * (Rajanpur below the Sulaiman range in 2022). Thresholds chosen on 14 towns (docs/VALIDATION.md), so the
+ * rating stops at "Some": it is a prompt to look, not a finding.
+ */
+export const TORRENT = { flat: 0.3, rise: 800 };
+
+export function rateRisks(input: { water?: WaterHistory | null; steep?: number | null; week?: Warning[]; ground?: HighGround | null; groundSearched?: boolean; flat?: number | null; nearbyRise?: number | null }): RiskItem[] {
   const out: RiskItem[] = [];
   const w = input.water;
   if (w !== undefined) {
@@ -71,6 +80,15 @@ export function rateRisks(input: { water?: WaterHistory | null; steep?: number |
     }
     out.push({ hazard: "flood", level, title: "Flooding", text });
   }
+  if (typeof input.flat === "number" && typeof input.nearbyRise === "number") {
+    const exposed = input.flat >= TORRENT.flat && input.nearbyRise >= TORRENT.rise;
+    out.push({
+      hazard: "torrent", level: exposed ? "medium" : "low", title: "Hill torrents",
+      text: exposed
+        ? `${pct(input.flat)} of the area is flat, and the land rises ${Math.round(input.nearbyRise).toLocaleString("en")} m within 50 km: heavy rain in those hills can send flash floods onto this plain, even where rivers never reached.`
+        : input.nearbyRise >= TORRENT.rise ? "Mountains are close, but little of this ground is flat enough for torrent water to spread and stand." : "No high ground close enough to send hill torrents here.",
+    });
+  }
   if (typeof input.steep === "number") {
     const s = input.steep;
     const level: Level = s > 0.25 ? "high" : s > 0.1 ? "medium" : "low";
@@ -83,22 +101,54 @@ export function rateRisks(input: { water?: WaterHistory | null; steep?: number |
   return out;
 }
 
-export interface RiskCheck { items: RiskItem[]; ground: HighGround | null; failed: string[] }
+/** The raw measurements behind the ratings, shown so a reader can check them. */
+export interface RiskSignals {
+  /** Share of the area flatter than 2 degrees. */
+  flat: number | null;
+  /** How far the land rises above the area's mean height within 50 km of its centre (m). */
+  nearbyRise: number | null;
+  /** Water occurrence (% of views since 1984) at the centre point itself. */
+  centreWater: number | null;
+}
+
+export interface RiskCheck { items: RiskItem[]; ground: HighGround | null; failed: string[]; signals: RiskSignals }
+
+/** The heights of the cells whose centres fall inside the grid's area. */
+export function heightsInside(g: Pick<HeightGrid, "heights" | "width" | "height" | "x0" | "y0" | "z" | "rings">): number[] {
+  const out: number[] = [];
+  for (let r = 0; r < g.height; r += 1) {
+    const lat = tileYToLat(g.y0 + (r + 0.5) / TILE, g.z);
+    for (let c = 0; c < g.width; c += 1) {
+      if (insideRings(((g.x0 + (c + 0.5) / TILE) / 2 ** g.z) * 360 - 180, lat, g.rings)) out.push(g.heights[r * g.width + c]!);
+    }
+  }
+  return out;
+}
+
+/** How far the land rises within `km` of a point above a given height: mountains that can send torrents down. */
+export async function nearbyRise(lon: number, lat: number, above: number, km = 50, signal?: AbortSignal): Promise<number> {
+  const g = await fetchHeights(squareAround(lon, lat, km * 2), signal);
+  // The tiles reach well beyond the square at low zoom; only cells inside it count.
+  return Math.max(0, heightsInside(g).reduce((m, h) => (h > m ? h : m), -Infinity) - above);
+}
 
 /** Reads water history, terrain and the forecast at once; each can fail alone. */
 export async function riskCheck(aoi: AoiGeometry, lat: number, lon: number, signal?: AbortSignal): Promise<RiskCheck> {
-  const [water, grid, outlook] = await Promise.allSettled([fetchWaterHistory(aoi, signal), fetchHeights(aoi, signal), fetchOutlook(lat, lon, signal)]);
+  const [water, grid, outlook, centre] = await Promise.allSettled([fetchWaterHistory(aoi, signal), fetchHeights(aoi, signal), fetchOutlook(lat, lon, signal), pointFacts(lon, lat, signal)]);
   const g = grid.status === "fulfilled" ? grid.value : null;
   const stats = g ? terrainStats(g.heights, g.width, g.height, g.x0, g.y0, g.z, g.rings) : null;
+  const rise = stats ? await nearbyRise(lon, lat, stats.mean, 50, signal).catch(() => null) : null;
+  const signals: RiskSignals = { flat: stats ? stats.slopeShares[0]! : null, nearbyRise: rise, centreWater: centre.status === "fulfilled" ? centre.value.water : null };
   const ground = g ? highGround(g, lon, lat) : null;
   const items = rateRisks({
     water: water.status === "fulfilled" ? water.value : undefined,
     steep: stats ? stats.slopeShares[3]! + stats.slopeShares[4]! : null,
     week: outlook.status === "fulfilled" ? warnings(outlook.value.days) : undefined,
     ground, groundSearched: !!g,
+    flat: signals.flat, nearbyRise: signals.nearbyRise,
   });
   const failed = [water.status === "rejected" && "water history", !stats && "elevation", outlook.status === "rejected" && "forecast"].filter((x): x is string => !!x);
-  return { items, ground, failed };
+  return { items, ground, failed, signals };
 }
 
-export const RISK_SOURCES = "Flooding from JRC Global Surface Water (every Landsat image 1984 to 2021, 30 m), which misses floods that came and went between images or under cloud, and street flooding in towns. Slope and higher ground from AWS Terrain Tiles (about 30 m; heights include buildings and trees). Forecast from Open-Meteo. A first look, not a survey: check with local authorities before you build or buy.";
+export const RISK_SOURCES = "Hill torrents from the share of flat ground and how far the land rises within 50 km (AWS Terrain Tiles); a screening rule tested on 14 towns only. Flooding from JRC Global Surface Water (every Landsat image 1984 to 2021, 30 m), which misses floods that came and went between images or under cloud, and street flooding in towns. Slope and higher ground from AWS Terrain Tiles (about 30 m; heights include buildings and trees). Forecast from Open-Meteo. A first look, not a survey: check with local authorities before you build or buy.";

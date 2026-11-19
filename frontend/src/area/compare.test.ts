@@ -18,10 +18,11 @@ describe("comparing two places", () => {
   it("puts both places on one line per question", () => {
     const lines = compareLines(place("Sukkur", "high", "low"), { ...place("Murree", "low", "high"), people: null });
     expect(lines[0]).toBe("Flooding since 1984: Sukkur high · Murree low");
-    expect(lines[1]).toBe("Landslide-prone slopes: Sukkur low · Murree high");
-    expect(lines[3]).toContain("Murree not read");
-    expect(lines[4]).toContain("built-up 60%, cropland 30%");
-    expect(lines[6]).toContain("June, highs of 41 °C");
+    expect(lines[1]).toBe("Hill torrents: Sukkur not read · Murree not read");
+    expect(lines[2]).toBe("Landslide-prone slopes: Sukkur low · Murree high");
+    expect(lines[4]).toContain("Murree not read");
+    expect(lines[5]).toContain("built-up 60%, cropland 30%");
+    expect(lines[7]).toContain("June, highs of 41 °C");
   });
 
   it("names the safer ground and why", () => {

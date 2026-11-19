@@ -479,6 +479,8 @@ async function terrain(a: Record<string, unknown>): Promise<ToolResult> {
   };
 }
 
+const pctOr = (v: number | null) => (v === null ? "not read" : `${Math.round(v * 100)}%`);
+
 async function riskCheckTool(a: Record<string, unknown>): Promise<ToolResult> {
   const area = await areaFor(a);
   if (typeof area === "string") return failed(area);
@@ -495,7 +497,11 @@ async function riskCheckTool(a: Record<string, unknown>): Promise<ToolResult> {
     say: `Risk check for ${area.label}: ${check.items.map((r) => `${r.title.toLowerCase()} ${word[r.level]}`).join(", ")}. Details below and in the side panel.${showWay ? " The line on the map leads to the nearest higher ground." : ""}`,
     card: {
       kind: "facts", title: `Risk check, ${area.label}`,
-      lines: [...(check.failed.length ? [`Could not read the ${check.failed.join(" or ")}.`] : []), RISK_SOURCES],
+      lines: [
+        ...(check.failed.length ? [`Could not read the ${check.failed.join(" or ")}.`] : []),
+        `Measured: flat ground ${pctOr(check.signals.flat)}; land rises ${check.signals.nearbyRise === null ? "not read" : `${Math.round(check.signals.nearbyRise).toLocaleString("en")} m`} within 50 km; the centre point was water in ${check.signals.centreWater === null ? "not read" : `${check.signals.centreWater}%`} of views since 1984`,
+        RISK_SOURCES,
+      ],
       findings: check.items.map((r) => ({ level: r.level === "low" ? "ok" : r.level === "high" ? "error" : "warn", text: `${r.title}: ${r.text}` })),
     },
     next: ["Show water since 1984 here", "Slope map here", "How many people live here?"],

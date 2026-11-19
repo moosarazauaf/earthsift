@@ -79,3 +79,49 @@ report precision and recall with confidence intervals.
    higher.
 3. Rate the clicked point as well as the square, so a city centre is not
    rated by the floodplain at its edge.
+
+## Sprint 2: two candidate fixes, tested on the same towns
+
+The two weak hits (Mehar, Rajanpur) were flooded mostly by rain and hill
+torrents; the false alarm (Lahore) came from the floodplain at the square's
+edge. Three signals were measured for all 14 towns before any rule changed
+(release 0.2.0-alpha.46, local build, 19 November 2026):
+
+| Town | 2022 | Flat ground (under 2°) | Land rises within 50 km | Centre point water since 1984 |
+|---|---|---|---|---|
+| Dadu | flooded | 50% | 815 m | 0% |
+| Jacobabad | flooded | 45% | 213 m | 0% |
+| Mehar | flooded | 34% | 193 m | 0% |
+| Khairpur Nathan Shah | flooded | 54% | 1,704 m | 0% |
+| Rajanpur | flooded | 32% | 1,377 m | 0% |
+| Charsadda | flooded | 41% | 1,860 m | 0% |
+| Nowshera | flooded | 23% | 1,658 m | 0% |
+| Sohbatpur | flooded | 41% | 1,053 m | 0% |
+| Murree | not flooded | 0% | 2,103 m | 0% |
+| Islamabad | not flooded | 30% | 2,374 m | 0% |
+| Abbottabad | not flooded | 7% | 5,611 m (a data spike) | 0% |
+| Faisalabad | not flooded | 67% | 214 m | 0% |
+| Gujranwala | not flooded | 41% | 46 m | 0% |
+| Lahore | not flooded | 34% | 196 m | 0% |
+
+A first measurement took the highest point over whole map tiles, which at
+low zoom reach far past 50 km (Nowshera read 6,627 m); it was fixed to count
+only cells inside the 50 km square, with a test, before these numbers.
+
+**What the evidence decided:**
+
+- **Rating the centre point: rejected.** Every town's centre, flooded or not,
+  was water in 0% of views. Lowering a rating on that basis would have
+  downgraded Dadu and Sohbatpur along with Lahore.
+- **Flat ground alone: rejected.** Faisalabad, which did not flood, is the
+  flattest of all (67%).
+- **Hill torrents, flat ground at least 30% with land rising at least 800 m
+  within 50 km: adopted as a separate rating, at most "Some".** It flags 5 of
+  8 flooded towns, including Rajanpur, and 1 of 6 dry ones, Islamabad, whose
+  Nullah Lai does carry flash floods. It does not flag Mehar, where the
+  Kirthar range lies beyond 50 km.
+
+**Caveat:** the 30% and 800 m thresholds were chosen by looking at these same
+14 towns, so these counts are in-sample and flatter the rule. That is why it
+never rates higher than "Some". It needs testing on towns it has not seen,
+which is the job of the mapped-extent validation (next steps, item 1).
