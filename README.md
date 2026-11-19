@@ -411,6 +411,10 @@ install icon in the address bar).
   Some will be off-topic or misplaced; every story links to its sources.
 - Carbon stock shows plants as they were in 2010 and soil to 30 cm only;
   soil carbon from SoilGrids is modelled and its range is wide.
+- The risk check was tested against the 2022 Pakistan floods: it flagged all 8
+  flooded towns (6 as High) and rated 5 of 6 dry towns Low; the false alarm was
+  Lahore, whose square takes in the Ravi floodplain. Fourteen towns is a first
+  look, not an accuracy: see [docs/VALIDATION.md](docs/VALIDATION.md).
 - The risk check's flood history ends in 2021 and misses floods that came and
   went between satellite images, under cloud, or in town streets. It is a
   first look, not a survey: check with local authorities before building or

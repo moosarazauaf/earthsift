@@ -5,6 +5,21 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.45] - 2026-11-19
+
+### Changed
+- **If the river rises** starts the water from the river: the median height
+  of ground that JRC Global Surface Water saw as water in at least half of all
+  views. Areas with no river fall back to their lowest ground, and the result
+  says which was used.
+
+### Added
+- **First visit guide**: three steps a newcomer cannot guess (click any
+  place; places open in tabs; ask anything), shown once.
+- **Validation of the risk check** against the 2022 Pakistan floods
+  ([docs/VALIDATION.md](docs/VALIDATION.md)): 8 of 8 flooded towns flagged,
+  5 of 6 dry towns rated Low.
+
 ## [0.2.0-alpha.44] - 2026-11-19
 
 A redesign after a review against desktop GIS conventions.
