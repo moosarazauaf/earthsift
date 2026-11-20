@@ -5,6 +5,17 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.47] - 2026-11-20
+
+### Added
+- **Accuracy test on 60 random squares** ([docs/VALIDATION.md](docs/VALIDATION.md),
+  sprint 3): the Flooding rating against Earthsift's own Sentinel-1 map of the
+  2022 floods. Pakistan squares: recall 82% (9 of 11), precision 90% (9 of 10),
+  specificity 97% (33 of 34), with 95% intervals. Every square rated High
+  flooded. The worst miss is a hill-torrent flood in Nasirabad rated Low.
+- The study's scripts and raw results in `docs/validation/`, so anyone can
+  draw the same squares and score them again.
+
 ## [0.2.0-alpha.46] - 2026-11-19
 
 ### Added

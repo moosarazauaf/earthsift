@@ -125,3 +125,93 @@ only cells inside the 50 km square, with a test, before these numbers.
 14 towns, so these counts are in-sample and flatter the rule. That is why it
 never rates higher than "Some". It needs testing on towns it has not seen,
 which is the job of the mapped-extent validation (next steps, item 1).
+
+## Sprint 3: scored against mapped 2022 flooding on 60 random squares
+
+The first test that does not rely on hand-picked towns (live site, release
+0.2.0-alpha.46, 20 November 2026).
+
+**Design.** Sixty 10 km squares were drawn at random (fixed seed 20220825)
+inside lon 66.8 to 71.5, lat 24.8 to 29.8, which covers Sindh, eastern
+Balochistan and southern Punjab. For each square the study recorded:
+
+1. the risk check's **Flooding** rating, as a visitor sees it (`?at=` link);
+2. the share of the square **newly under water** in 2022, from Earthsift's
+   own Sentinel-1 FloodLens run (before 15 May to 15 June 2022, flood
+   25 August to 10 September 2022).
+
+A square counts as **flooded** if at least 5% of it was newly under water.
+A rating of High or Some counts as **flagged**. The squares were drawn before
+any result was seen, and no rule was changed after. Thirteen squares fell in
+India (Thar desert), so the headline uses the 47 Pakistan squares. Two of
+those had no radar result (the run timed out: squares 15 and 18), leaving 45.
+The scripts and the raw results are in [validation/](validation/).
+
+**Results, Pakistan squares (n = 45: 11 flooded, 34 not).**
+
+| | Flooded | Not flooded |
+|---|---|---|
+| Flagged (High or Some) | 9 | 1 |
+| Rated Low | 2 | 33 |
+
+| Measure | Value | 95% interval (Wilson) |
+|---|---|---|
+| Recall: flooded squares flagged | 82% (9 of 11) | 52 to 95% |
+| Precision: flagged squares that flooded | 90% (9 of 10) | 60 to 98% |
+| Specificity: dry squares rated Low | 97% (33 of 34) | 85 to 99% |
+
+- Every square rated **High** flooded (7 of 7). Mean share newly under water:
+  High 29.5%, Some 15.0%, Low 1.7%.
+- **The cut-off matters for recall.** At 2% newly under water recall falls to
+  69% (9 of 13, interval 42 to 87%); at 10% it is 90% (9 of 10). Precision
+  and specificity do not change. The rating catches the heavily flooded
+  squares and misses some of the lightly flooded ones.
+- **All 58 squares with a result, India included:** recall 83% (10 of 12),
+  precision 77% (10 of 13), specificity 93% (43 of 46). Two of the three
+  false alarms are in Jaisalmer, where old lake beds and ponds show past water
+  but nothing new flooded in 2022.
+
+**The misses and the false alarm, one by one.**
+
+- **Square 22, Nasirabad: rated Low, 36% newly under water.** The worst miss.
+  Its neighbours in Kachhi and Nasirabad (squares 9, 38, 40, 53) were rated
+  High or Some and flooded by 30 to 66%. The water came from hill torrents
+  and rain off the Kirthar and Sulaiman ranges onto ground with little water
+  in the Landsat record, the same failure seen at Mehar in sprint 1. The
+  torrent rule did not fire here either.
+- **Square 44, Khairpur: rated Low, 8.5% newly under water.** A light, rain-fed
+  flood on irrigated land.
+- **Square 26, Kohlu: rated Some, 0.2% newly under water.** A hill district
+  whose valley floors hold water in some years; it did not flood in 2022.
+
+**The hill-torrent rating, out of sample.** In the Pakistan squares it rated
+7 squares Some, of which 4 flooded (57%), against 7 of 38 (18%) for squares it
+rated Low. It points the right way, but 7 squares is too few to tell, and it
+missed square 22, the clearest torrent flood in the sample.
+
+**What this shows.** On randomly drawn ground in the 2022 flood region, a High
+or Some rating was a reliable warning (9 of 10 flagged squares flooded), and
+a Low rating was mostly right (33 of 35). The weak side is recall on rain and
+torrent floods over ground that rarely held water before 2022. That matches
+sprint 1 and sprint 2, now on squares the rules were not tuned on.
+
+**Limits.**
+
+- The "truth" is our own FloodLens radar map, which has not itself been
+  checked against an independent extent such as UNOSAT's. Radar misses water
+  under crops and between buildings, so lightly flooded squares may be
+  undercounted, which would make recall look worse and precision better than
+  they are.
+- Forty-five squares give wide intervals: recall could be as low as about
+  half.
+- One event, one region, one season, and 10 km squares only.
+- About 1 square in 4 flooded, which is far more than in most regions, so the
+  precision here would not carry over to a place where floods are rarer.
+
+**Next steps.**
+
+1. Fix the torrent miss: test a rule that looks for the hills up to 100 km
+   away and counts dry-wash channels (squares 22 and 9 are the test cases).
+   Score it on a fresh random draw with a new seed, not on these squares.
+2. Check FloodLens against UNOSAT's 2022 extent on a few squares, so the
+   truth used here has a known error.

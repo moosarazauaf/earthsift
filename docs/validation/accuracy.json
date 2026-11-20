@@ -1,0 +1,542 @@
+[
+ {
+  "id": 1,
+  "lon": 70.9709,
+  "lat": 27.1159,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer Tehsil, India",
+  "flooded": 6.4
+ },
+ {
+  "id": 2,
+  "lon": 70.0693,
+  "lat": 25.3017,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Umerkot District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 3,
+  "lon": 70.2197,
+  "lat": 26.2671,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer Tehsil, India",
+  "flooded": 0.2
+ },
+ {
+  "id": 4,
+  "lon": 71.2231,
+  "lat": 25.3357,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Dhanaoo Tehsil, India",
+  "flooded": 0
+ },
+ {
+  "id": 5,
+  "lon": 70.8587,
+  "lat": 28.8492,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Bahawalpur Division, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 6,
+  "lon": 69.0894,
+  "lat": 25.0979,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Mirpur Khas District, Pakistan",
+  "flooded": 21
+ },
+ {
+  "id": 7,
+  "lon": 68.1623,
+  "lat": 26.9664,
+  "flood": "medium",
+  "torrent": "low",
+  "place": "10 km around Naushahro Feroze District, Pakistan",
+  "flooded": 15.1
+ },
+ {
+  "id": 8,
+  "lon": 71.194,
+  "lat": 26.031,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Sheo Tehsil, India",
+  "flooded": 0.3
+ },
+ {
+  "id": 9,
+  "lon": 67.8446,
+  "lat": 28.6339,
+  "flood": "medium",
+  "torrent": "medium",
+  "place": "10 km around Kachhi District, Pakistan",
+  "flooded": 29.8
+ },
+ {
+  "id": 10,
+  "lon": 70.2673,
+  "lat": 28.5099,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Rahim Yar Khan, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 11,
+  "lon": 66.9974,
+  "lat": 29.1793,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Qalat District, Pakistan",
+  "flooded": 0.4
+ },
+ {
+  "id": 12,
+  "lon": 69.459,
+  "lat": 27.0735,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khairpur District, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 13,
+  "lon": 67.181,
+  "lat": 27.7522,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khuzdar District, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 14,
+  "lon": 70.7545,
+  "lat": 26.9153,
+  "flood": "medium",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer, India",
+  "flooded": 3
+ },
+ {
+  "id": 15,
+  "lon": 66.8794,
+  "lat": 24.9121,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Karachi Division, Pakistan",
+  "error": "Waiting failed"
+ },
+ {
+  "id": 16,
+  "lon": 70.3702,
+  "lat": 25.8687,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Gadraroad Tehsil, India",
+  "flooded": 0.1
+ },
+ {
+  "id": 17,
+  "lon": 69.0447,
+  "lat": 26.0608,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Sanghar District, Pakistan",
+  "flooded": 12.6
+ },
+ {
+  "id": 18,
+  "lon": 69.5897,
+  "lat": 28.345,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Bahawalpur Division, Pakistan",
+  "error": "Waiting failed"
+ },
+ {
+  "id": 19,
+  "lon": 70.4498,
+  "lat": 28.4,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Rahim Yar Khan, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 20,
+  "lon": 71.4905,
+  "lat": 27.1247,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer Tehsil, India",
+  "flooded": 0
+ },
+ {
+  "id": 21,
+  "lon": 69.718,
+  "lat": 27.5805,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Ghotki District, Pakistan",
+  "flooded": 0.7
+ },
+ {
+  "id": 22,
+  "lon": 67.9642,
+  "lat": 28.55,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Nasirabad District, Pakistan",
+  "flooded": 36
+ },
+ {
+  "id": 23,
+  "lon": 67.2846,
+  "lat": 25.1571,
+  "flood": "low",
+  "torrent": "medium",
+  "place": "10 km around Karachi Division, Pakistan",
+  "flooded": 0.6
+ },
+ {
+  "id": 24,
+  "lon": 69.8186,
+  "lat": 27.7584,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Ghotki District, Pakistan",
+  "flooded": 2.1
+ },
+ {
+  "id": 25,
+  "lon": 68.81,
+  "lat": 26.5094,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Shaheed Benazirabad District, Pakistan",
+  "flooded": 1.3
+ },
+ {
+  "id": 26,
+  "lon": 69.3675,
+  "lat": 29.5545,
+  "flood": "medium",
+  "torrent": "low",
+  "place": "10 km around Kohlu District, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 27,
+  "lon": 69.7972,
+  "lat": 29.0407,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Dera Ghazi Khan Division, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 28,
+  "lon": 71.1166,
+  "lat": 29.0735,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Bahawalpur District, Pakistan",
+  "flooded": 0.8
+ },
+ {
+  "id": 29,
+  "lon": 69.8629,
+  "lat": 29.16,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Dera Ghazi Khan Division, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 30,
+  "lon": 70.0124,
+  "lat": 25.5875,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Umerkot District, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 31,
+  "lon": 67.2528,
+  "lat": 28.4609,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Jhal Magsi District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 32,
+  "lon": 70.5746,
+  "lat": 29.7173,
+  "flood": "low",
+  "torrent": "medium",
+  "place": "10 km around Dera Ghazi Khan Division, Pakistan",
+  "flooded": 0.3
+ },
+ {
+  "id": 33,
+  "lon": 70.577,
+  "lat": 28.213,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Bahawalpur Division, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 34,
+  "lon": 70.3607,
+  "lat": 25.3929,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Tharparkar District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 35,
+  "lon": 69.6482,
+  "lat": 28.894,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Dera Ghazi Khan Division, Pakistan",
+  "flooded": 0.4
+ },
+ {
+  "id": 36,
+  "lon": 66.9545,
+  "lat": 27.9914,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khuzdar District, Pakistan",
+  "flooded": 0.2
+ },
+ {
+  "id": 37,
+  "lon": 67.5067,
+  "lat": 29.2151,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Kachhi District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 38,
+  "lon": 67.8305,
+  "lat": 28.7576,
+  "flood": "high",
+  "torrent": "medium",
+  "place": "10 km around Kachhi District, Pakistan",
+  "flooded": 34.8
+ },
+ {
+  "id": 39,
+  "lon": 70.7048,
+  "lat": 27.3374,
+  "flood": "medium",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer Tehsil, India",
+  "flooded": 1.7
+ },
+ {
+  "id": 40,
+  "lon": 67.7664,
+  "lat": 28.6589,
+  "flood": "high",
+  "torrent": "medium",
+  "place": "10 km around Kachhi District, Pakistan",
+  "flooded": 33.3
+ },
+ {
+  "id": 41,
+  "lon": 70.5909,
+  "lat": 28.4301,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Bahawalpur Division, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 42,
+  "lon": 66.8971,
+  "lat": 26.0709,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Lasbela District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 43,
+  "lon": 70.2412,
+  "lat": 26.0265,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Gadraroad Tehsil, India",
+  "flooded": 0.2
+ },
+ {
+  "id": 44,
+  "lon": 68.4426,
+  "lat": 26.6894,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khairpur District, Pakistan",
+  "flooded": 8.5
+ },
+ {
+  "id": 45,
+  "lon": 68.6747,
+  "lat": 28.8331,
+  "flood": "low",
+  "torrent": "medium",
+  "place": "10 km around Dera Bugti District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 46,
+  "lon": 70.7846,
+  "lat": 26.662,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Fatehgarh Tehsil, India",
+  "flooded": 0.1
+ },
+ {
+  "id": 47,
+  "lon": 71.0319,
+  "lat": 26.1125,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Sheo Tehsil, India",
+  "flooded": 0.1
+ },
+ {
+  "id": 48,
+  "lon": 69.2217,
+  "lat": 26.2938,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khairpur District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 49,
+  "lon": 68.2378,
+  "lat": 25.0574,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Thatta District, Pakistan",
+  "flooded": 19
+ },
+ {
+  "id": 50,
+  "lon": 68.978,
+  "lat": 29.7113,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Kohlu District, Pakistan",
+  "flooded": 0
+ },
+ {
+  "id": 51,
+  "lon": 68.4094,
+  "lat": 26.5981,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Shaheed Benazirabad District, Pakistan",
+  "flooded": 4.6
+ },
+ {
+  "id": 52,
+  "lon": 68.8017,
+  "lat": 27.7355,
+  "flood": "high",
+  "torrent": "low",
+  "place": "10 km around Sukkur District, Pakistan",
+  "flooded": 19.4
+ },
+ {
+  "id": 53,
+  "lon": 67.7746,
+  "lat": 28.4409,
+  "flood": "high",
+  "torrent": "medium",
+  "place": "10 km around Nasirabad District, Pakistan",
+  "flooded": 66.2
+ },
+ {
+  "id": 54,
+  "lon": 67.6473,
+  "lat": 29.7813,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Sibi District, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 55,
+  "lon": 66.998,
+  "lat": 29.5419,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Mastung District, Pakistan",
+  "flooded": 0.3
+ },
+ {
+  "id": 56,
+  "lon": 66.9075,
+  "lat": 27.1564,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Khuzdar District, Pakistan",
+  "flooded": 0.4
+ },
+ {
+  "id": 57,
+  "lon": 67.3366,
+  "lat": 25.61,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Karachi Division, Pakistan",
+  "flooded": 0.6
+ },
+ {
+  "id": 58,
+  "lon": 70.9921,
+  "lat": 27.5054,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Jaisalmer Tehsil, India",
+  "flooded": 1.7
+ },
+ {
+  "id": 59,
+  "lon": 70.3428,
+  "lat": 28.4964,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Rahim Yar Khan, Pakistan",
+  "flooded": 0.1
+ },
+ {
+  "id": 60,
+  "lon": 70.4587,
+  "lat": 26.2779,
+  "flood": "low",
+  "torrent": "low",
+  "place": "10 km around Fatehgarh Tehsil, India",
+  "flooded": 0.4
+ }
+]
