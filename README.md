@@ -411,11 +411,13 @@ install icon in the address bar).
   Some will be off-topic or misplaced; every story links to its sources.
 - Carbon stock shows plants as they were in 2010 and soil to 30 cm only;
   soil carbon from SoilGrids is modelled and its range is wide.
-- The risk check was scored against Earthsift's own radar map of the 2022
-  Pakistan floods on 45 random 10 km squares: it flagged 9 of 11 flooded
-  squares (recall 82%, 95% interval 52 to 95%), and 9 of the 10 squares it
-  flagged did flood. It misses rain and hill-torrent floods on ground that
-  rarely held water before; see [docs/VALIDATION.md](docs/VALIDATION.md).
+- The Flooding rating was scored against Earthsift's own radar map of the 2022
+  Pakistan floods on 94 random 10 km squares: it flagged 21 of 24 flooded
+  squares (recall 88%, 95% interval 69 to 96%), and 21 of the 26 squares it
+  flagged did flood (81%, 62 to 91%). All 18 rated High flooded, but only 3 of
+  the 8 rated Some did. The separate Hill torrents rating is
+  weaker: 4 of the 11 squares it flagged flooded. See
+  [docs/VALIDATION.md](docs/VALIDATION.md).
 - The risk check's flood history ends in 2021 and misses floods that came and
   went between satellite images, under cloud, or in town streets. It is a
   first look, not a survey: check with local authorities before building or

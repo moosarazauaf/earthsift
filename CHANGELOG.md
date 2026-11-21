@@ -5,6 +5,18 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.49] - 2026-11-21
+
+### Tested and rejected
+- A wider hill-torrent rule (hills within 100 km). On 60 new random squares it
+  caught no extra flood and added a false alarm, so the app keeps today's rule
+  ([docs/VALIDATION.md](docs/VALIDATION.md), sprint 4).
+
+### Changed
+- The published accuracy now pools both random draws (94 Pakistan squares):
+  recall 88%, precision 81%, specificity 93%, with 95% intervals. Today's torrent
+  rating is reported as weak: 4 of the 11 squares it flagged flooded.
+
 ## [0.2.0-alpha.48] - 2026-11-21
 
 ### Fixed

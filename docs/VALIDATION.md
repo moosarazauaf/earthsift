@@ -228,3 +228,47 @@ sprint 1 and sprint 2, now on squares the rules were not tuned on.
    Score it on a fresh random draw with a new seed, not on these squares.
 2. Check FloodLens against UNOSAT's 2022 extent on a few squares, so the
    truth used here has a known error.
+
+## Sprint 4: a wider torrent rule, rejected on fresh squares
+
+Square 22 in sprint 3 flooded by 36% and was rated Low, because the hills lie
+more than 50 km away. A candidate rule looked further: at least 30% flat, with
+the 99th-percentile height within 100 km at least 1,000 m above the square.
+On the sprint 3 squares, where it was chosen, it looked better than today's
+rule (10 of 11 floods caught and 2 false alarms, against 9 and 4).
+
+**The test.** The rule and its pass mark were written down
+([FROZEN_RULE.txt](validation/FROZEN_RULE.txt)) before 60 new squares were
+drawn (seed 20261121, same region and method). It would ship only if, with the
+Flooding rating, it caught at least as many floods as today's rule with no more
+false alarms. All 60 squares returned a result after retries; 49 are in Pakistan
+(13 flooded at the 5% cut-off).
+
+| Pakistan squares (n = 49) | Floods caught | False alarms |
+|---|---|---|
+| Flooding rating alone | 12 of 13 | 4 |
+| With today's torrent rule | 12 of 13 | 7 |
+| With the candidate rule | 12 of 13 | 8 |
+
+**Decision: rejected.** It caught no extra flood and added one false alarm, so
+the app keeps today's rule. Its gain on the sprint 3 squares did not carry over.
+
+**A finding about today's rule.** On these new squares it fired 4 times and none
+of the 4 flooded by 5%. Across both draws, 4 of the 11 squares it flagged flooded
+(36%, interval 15 to 65%). At the 2% cut-off it did add one flooded square, so
+the evidence is thin, but it is not yet a useful predictor.
+
+**The Flooding rating on new squares.** It was not changed between draws, so
+both are fair tests of it:
+
+| Pakistan squares | Sprint 3 (n = 45) | Sprint 4 (n = 49) | Both (n = 94) |
+|---|---|---|---|
+| Recall | 9 of 11 | 12 of 13 | 21 of 24, 88% (69 to 96%) |
+| Precision | 9 of 10 | 12 of 16 | 21 of 26, 81% (62 to 91%) |
+| Specificity | 33 of 34 | 32 of 36 | 65 of 70, 93% (84 to 97%) |
+
+**High and Some mean very different things.** Across both draws, all 18 squares
+rated High flooded (100%, interval 82 to 100%), but only 3 of the 8 rated Some
+did (38%, interval 14 to 69%). The false alarms in the Flooding rating are almost
+all Some. The limits in sprint 3 still apply: the truth is our own radar map, for
+one event in one region.

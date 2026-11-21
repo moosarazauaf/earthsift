@@ -5,12 +5,12 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const COUNT = Number(process.argv[2] ?? 40);
 const SITE = process.argv[3] ?? "https://moosarazauaf.github.io/earthsift/";
-const OUT = "accuracy.json";
+const OUT = process.env.OUT ?? "accuracy.json";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Fixed seed so anyone can draw the same squares.
 function mulberry32(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-const rand = mulberry32(20220825);
+const rand = mulberry32(Number(process.env.SEED ?? 20220825));
 // The 2022 flood region: Sindh, southern Punjab and eastern Balochistan.
 const BOX = { west: 66.8, east: 71.5, south: 24.8, north: 29.8 };
 const squares = Array.from({ length: COUNT }, (_, i) => ({ id: i + 1, lon: +(BOX.west + rand() * (BOX.east - BOX.west)).toFixed(4), lat: +(BOX.south + rand() * (BOX.north - BOX.south)).toFixed(4) }));

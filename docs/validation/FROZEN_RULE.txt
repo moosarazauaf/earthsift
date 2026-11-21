@@ -1,0 +1,5 @@
+Frozen 2026-11-21, before any holdout square was drawn or scored.
+Candidate torrent rule C: flat share >= 0.30 AND 99th-percentile height within a 200 km square (100 km each way) minus the square's mean >= 1000 m.
+Compared with today's rule A: flat >= 0.30 AND max height within 50 km minus mean >= 800 m.
+Holdout: 60 new squares, same box, seed 20261121. Flooded = at least 5% newly under water. Primary set: Pakistan squares.
+Ship C only if, on the holdout, flagged-by-either-rating recall is not lower than with A and false alarms are not higher.
