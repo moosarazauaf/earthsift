@@ -5,6 +5,21 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.48] - 2026-11-21
+
+### Fixed
+- **Place search could pick the wrong place.** "Mehar, Pakistan" chose a village
+  in Khairpur instead of Mehar in Dadu. A taluka or district now beats a village
+  of the same name, in the search box, Sentri, comparisons and analysis requests.
+- Replies name the district when another place shares the name, for example
+  "Mehar Taluka, Dadu District".
+
+### Corrected
+- [docs/VALIDATION.md](docs/VALIDATION.md): sprints 1 and 2 scored the wrong
+  Mehar. At Mehar Taluka the Flooding rating is High, so 7 of 8 flooded towns
+  rate High rather than 6 of 8, and the claim built on the old reading is
+  withdrawn.
+
 ## [0.2.0-alpha.47] - 2026-11-20
 
 ### Added

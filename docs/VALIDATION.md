@@ -3,6 +3,19 @@
 A first out-of-sample test of the **Flooding** rating in Earthsift's risk
 check, run on the live site on 19 November 2026 (release 0.2.0-alpha.44).
 
+> **Correction, 21 November 2026.** Sprints 1 and 2 scored the wrong Mehar.
+> "Mehar, Pakistan" returned a village in Kot Diji taluka, Khairpur district,
+> not Mehar in Dadu district, which is the place reported flooded in 2022. The
+> Mehar rows below are kept as run, and describe that village. Read at the
+> centre of Mehar Taluka, Dadu, the Flooding rating is **High** (34% of the
+> square under water some of the time since 1984; 62% flat; land rises 177 m
+> within 50 km; Hill torrents Low). So 8 of 8 flooded towns are still flagged,
+> and 7 of 8 rather than 6 of 8 are rated High. The explanation below of Mehar
+> as a rain-and-torrent flood the rating underrates was drawn from the wrong
+> place and is withdrawn; Rajanpur remains the example. The taluka centre is
+> not the town centre, whose own square may read differently. Place search now
+> prefers the taluka and names the district (release 0.2.0-alpha.48).
+
 ## Design
 
 The rating reads JRC Global Surface Water, which ends in **2021**. The 2022
@@ -177,7 +190,7 @@ The scripts and the raw results are in [validation/](validation/).
   Its neighbours in Kachhi and Nasirabad (squares 9, 38, 40, 53) were rated
   High or Some and flooded by 30 to 66%. The water came from hill torrents
   and rain off the Kirthar and Sulaiman ranges onto ground with little water
-  in the Landsat record, the same failure seen at Mehar in sprint 1. The
+  in the Landsat record. The
   torrent rule did not fire here either.
 - **Square 44, Khairpur: rated Low, 8.5% newly under water.** A light, rain-fed
   flood on irrigated land.
