@@ -13,7 +13,7 @@ import { useWatchedPlaces } from "../area/watch";
 import { modeForRun } from "../app/shareRun";
 import { looksLikeRequest } from "../agent/args";
 import { interpret } from "../ask/interpret";
-import { requestRun } from "../ask/request";
+import { bestPlace, requestRun } from "../ask/request";
 import { districtAt } from "../area/districts";
 import { PIXEL_BUDGET, deviceProfile } from "../engine/client";
 
@@ -158,7 +158,8 @@ export function TopBar() {
     }
     try {
       const { results } = await api.geocode(query.trim());
-      setPlaces(results);
+      const best = bestPlace(results);
+      setPlaces(best ? [best, ...results.filter((r) => r !== best)] : results);
       if (results.length === 0) setMessage("No place found with that name.");
     } catch (error) {
       setMessage(error instanceof ApiError ? error.message : "Place search failed.");

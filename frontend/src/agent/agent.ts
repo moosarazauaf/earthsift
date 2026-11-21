@@ -12,7 +12,7 @@ import { useStore } from "../app/store";
 import type { AoiGeometry, Period } from "../app/types";
 import { modeForRun } from "../app/shareRun";
 import { type Ask, interpret } from "../ask/interpret";
-import { STREET, requestRun } from "../ask/request";
+import { bestPlace, placeLabel, requestRun } from "../ask/request";
 import { carbonInBrowser, deviceProfile, exposureInBrowser, landCoverInBrowser, PIXEL_BUDGET, populationInBrowser } from "../engine/client";
 import { compareLines, readPlace, verdict } from "../area/compare";
 import { formatPeople } from "../engine/population";
@@ -285,10 +285,9 @@ async function planAnalysis(text: string, ask: Ask, dates: { start: string; end:
 
 async function openArea(place: string, sizeKm: number | null): Promise<ToolResult> {
   const { results } = await api.geocode(place);
-  // Prefer the place itself over a street or building that shares its name.
-  const found = results.find((r) => !STREET.test(r.kind)) ?? results[0];
+  const found = bestPlace(results);
   if (!found) return failed(`No place called "${place}" was found. Try adding the country.`);
-  const label = found.name.split(",")[0]!.trim();
+  const label = placeLabel(found, results);
   const geometry = squareAround(found.lon, found.lat, sizeKm ?? 10);
   useStore.getState().setAoi({ geometry, label });
   useStore.getState().set({ mode: "area", introOpen: false, result: null });
@@ -325,10 +324,9 @@ async function areaFor(a: Record<string, unknown>): Promise<{ geometry: AoiGeome
   const place = str(a.place, 120);
   if (!place) return useStore.getState().aoi ?? "Which place? Name one, or open an area on the map first.";
   const { results } = await api.geocode(place);
-  // Prefer the place itself over a street or building that shares its name.
-  const found = results.find((r) => !STREET.test(r.kind)) ?? results[0];
+  const found = bestPlace(results);
   if (!found) return `No place called "${place}" was found. Try adding the country.`;
-  const area = { geometry: squareAround(found.lon, found.lat, num(a.size_km, 1, 50) ?? 10), label: found.name.split(",")[0]!.trim() };
+  const area = { geometry: squareAround(found.lon, found.lat, num(a.size_km, 1, 50) ?? 10), label: placeLabel(found, results) };
   useStore.getState().setAoi(area);
   void getGlobe()?.flyToBounds(geometryBounds(area.geometry));
   return area;
@@ -531,9 +529,9 @@ async function floodRise(a: Record<string, unknown>): Promise<ToolResult> {
 async function placeArea(place: string | null, km: number): Promise<{ geometry: AoiGeometry; label: string } | string> {
   if (!place) return "Name both places, for example \"compare Lahore and Islamabad\".";
   const { results } = await api.geocode(place);
-  const found = results.find((r) => !STREET.test(r.kind)) ?? results[0];
+  const found = bestPlace(results);
   if (!found) return `No place called "${place}" was found. Try adding the country.`;
-  return { geometry: squareAround(found.lon, found.lat, km), label: found.name.split(",")[0]!.trim() };
+  return { geometry: squareAround(found.lon, found.lat, km), label: placeLabel(found, results) };
 }
 
 async function comparePlaces(a: Record<string, unknown>): Promise<ToolResult> {
