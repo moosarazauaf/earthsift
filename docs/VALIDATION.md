@@ -269,6 +269,6 @@ both are fair tests of it:
 
 **High and Some mean very different things.** Across both draws, all 18 squares
 rated High flooded (100%, interval 82 to 100%), but only 3 of the 8 rated Some
-did (38%, interval 14 to 69%). The false alarms in the Flooding rating are almost
-all Some. The limits in sprint 3 still apply: the truth is our own radar map, for
+did (38%, interval 14 to 69%). All 5 false alarms in the Flooding rating were rated
+Some. The limits in sprint 3 still apply: the truth is our own radar map, for
 one event in one region.
