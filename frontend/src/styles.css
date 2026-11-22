@@ -867,6 +867,7 @@ button.primary { color: #1b1d14; }
 .area-tabs { position: sticky; top: 0; z-index: 2; display: flex; gap: 4px; padding: 6px 0 8px; background: var(--panel-solid); border-bottom: 1px solid var(--line); margin-bottom: 8px; overflow-x: auto; }
 .area-tabs button { flex: 1 1 0; min-width: 0; padding-inline: 4px; border-radius: 4px; overflow: hidden; text-overflow: ellipsis; }
 .area-tabs button.on { background: var(--cyan); color: #0a1013; border-color: var(--cyan); font-weight: 700; }
+@media (max-width: 800px) { .area-tabs button { font-size: 12px; padding-inline: 1px; text-overflow: clip; } }
 .compare-with button { width: 100%; }
 /* What's here: the identify card, bottom centre. */
 .whats-here { border-color: var(--cyan); }

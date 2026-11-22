@@ -8,8 +8,8 @@ authors:
 repository-code: "https://github.com/moosarazauaf/earthsift"
 url: "https://moosarazauaf.github.io/earthsift/"
 license: MIT
-version: "0.2.0-alpha.49"
-date-released: 2026-11-21
+version: "0.2.0-alpha.50"
+date-released: 2026-11-22
 keywords:
   - remote sensing
   - change detection

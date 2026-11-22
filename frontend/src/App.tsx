@@ -30,6 +30,8 @@ function restoreFromUrl() {
   const store = useStore.getState();
   const hasRun = new URLSearchParams(window.location.search).has("run");
   const at = parseAt(window.location.search);
+  const query = new URLSearchParams(window.location.search);
+  if ((query.has("at") && !at) || (hasRun && !decodeRun(query.get("run")))) store.set({ notice: "This link is damaged or out of date, so it could not be opened." });
   if (at) {
     useStore.getState().analyseAt(at.lon, at.lat, at.km);
     void getGlobe()?.flyTo(at.lon, at.lat, at.km * 4000, 0);

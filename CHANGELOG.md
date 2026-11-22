@@ -5,6 +5,15 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.50] - 2026-11-22
+
+### Fixed
+- Damaged shared links now say so instead of being silently ignored.
+- The rain map skips times NASA lists before their tiles are ready.
+- The Summary tab label fits on phones.
+- The hill-torrent source note reports the 94-square test, not the old 14 towns.
+- Updated `dompurify` to clear a low-severity advisory.
+
 ## [0.2.0-alpha.49] - 2026-11-21
 
 ### Tested and rejected

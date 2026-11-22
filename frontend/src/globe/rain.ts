@@ -32,6 +32,11 @@ export async function latestRainTime(now = new Date()): Promise<string> {
   if (!response.ok) throw new Error("NASA GIBS did not respond.");
   const latest = lastDomainTime(await response.text());
   if (!latest) throw new Error("No recent rain maps were listed.");
+  // GIBS can list a time before its tiles are served, which would show as blank frames.
+  for (const time of rainTimes(latest, 5).reverse()) {
+    const tile = await fetch(rainTileUrl(time).replace("{z}/{y}/{x}", "0/0/0")).catch(() => null);
+    if (!tile || tile.ok) return time;
+  }
   return latest;
 }
 
