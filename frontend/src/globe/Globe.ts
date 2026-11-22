@@ -10,6 +10,7 @@ import {
   Color,
   ColorMaterialProperty,
   ConstantPositionProperty,
+  CallbackProperty,
   ConstantProperty,
   Entity,
   GeoJsonDataSource,
@@ -22,8 +23,6 @@ import {
   PolylineGraphics,
   Rectangle,
   SceneTransforms,
-  EllipsoidalOccluder,
-  Ellipsoid,
   ScreenSpaceEventHandler,
   ScreenSpaceEventType,
   SingleTileImageryProvider,
@@ -43,7 +42,7 @@ import { type Satellite, positionAt, track } from "./satellites";
 import { SHADERS, type ViewMode } from "./viewModes";
 import { type WindField, advect, speedColour } from "./wind";
 import { EARTH_LAYERS } from "./earthToday";
-import { BADGE_PX, GDACS_HAZARD, badge, spreadOffsets } from "./pixelMarkers";
+import { GDACS_HAZARD, ICON_MID, PHI, badge, iconBasePx, iconPx, iconWeight, spreadOffsets } from "./pixelMarkers";
 import type { Hazard } from "../news/types";
 import { WATER_TILES } from "../area/waterHistory";
 import type { SatRec } from "satellite.js";
@@ -168,7 +167,7 @@ export class Globe {
     this.watchHover();
     // Overlaps depend on the zoom, so markers are spread again whenever the camera stops.
     this.viewer.camera.moveEnd.addEventListener(() => this.spreadMarkers());
-    scene.preUpdate.addEventListener(() => this.stepFades());
+    scene.preUpdate.addEventListener(() => { this.followCamera(); this.stepFades(); });
     scene.globe.tileLoadProgressEvent.addEventListener((queued: number) => {
       // In request-render mode nothing draws once a tile lands; keep frames coming until the queue is empty, so it is reported.
       if (queued > 0) this.render();
@@ -480,7 +479,7 @@ export class Globe {
       const colour = Color.fromCssColorString(sat.colour);
       const dot = this.viewer.entities.add({
         position: place(positionAt(rec, start) ?? { lon: 0, lat: 0 }),
-        point: { pixelSize: 7, color: colour, outlineColor: Color.BLACK.withAlpha(0.6), outlineWidth: 1 },
+        point: { pixelSize: new CallbackProperty(() => this.iconBase / 3, false), color: colour, outlineColor: Color.BLACK.withAlpha(0.6), outlineWidth: 1 },
         label: { text: sat.name, font: "11px Inter Variable, sans-serif", fillColor: colour, pixelOffset: new Cartesian2(0, -14), showBackground: true, backgroundColor: Color.fromCssColorString("#14120e").withAlpha(0.7) },
       });
       const line = this.viewer.entities.add({ polyline: { positions: orbit(rec, start), width: 1.8, material: colour.withAlpha(0.75), arcType: 0 } });
@@ -753,6 +752,42 @@ export class Globe {
   private markerNames = new Map<string, string>();
   private hoverLabel: Entity | null = null;
 
+  /** The size all map icons share this frame, from the camera height. */
+  private iconBase: number = ICON_MID;
+
+  private lastCamera = new Cartesian3();
+  private spreadTimer = 0;
+
+  /** Sizes icons for this frame. Frames stop when the camera does, so moveEnd can come late: fan markers out shortly after the last move. */
+  private followCamera() {
+    const { camera } = this.viewer;
+    this.iconBase = iconBasePx(camera.positionCartographic.height);
+    if (Cartesian3.equalsEpsilon(camera.positionWC, this.lastCamera, undefined, 1)) return;
+    Cartesian3.clone(camera.positionWC, this.lastCamera);
+    window.clearTimeout(this.spreadTimer);
+    this.spreadTimer = window.setTimeout(() => { if (!this.viewer.isDestroyed()) this.spreadMarkers(); }, 180);
+  }
+
+  /** A billboard's image and scale that follow the zoom; small sizes use a smaller drawing so they stay sharp. */
+  private zoomIcon(position: Cartesian3, draw: (res: number) => HTMLCanvasElement, weight: number) {
+    const res = () => (iconPx(this.iconBase, weight) <= 17 ? 34 : 68);
+    return {
+      show: this.onNearSide(position),
+      image: new CallbackProperty(() => draw(res()), false),
+      scale: new CallbackProperty(() => iconPx(this.iconBase, weight) / res(), false),
+    };
+  }
+
+  /** Markers ignore depth so terrain cannot cut them, so the far side of the Earth must be hidden by hand. */
+  private onNearSide(position: Cartesian3) {
+    return new CallbackProperty(() => Cartesian3.dot(position, this.viewer.camera.positionWC) > Cartesian3.magnitudeSquared(position), false);
+  }
+
+  /** A label offset that stays just above an icon as it changes size. */
+  private aboveIcon(weight: number, gap: number) {
+    return new CallbackProperty(() => new Cartesian2(0, -iconPx(this.iconBase, weight) / 2 - gap), false);
+  }
+
   /** Fans out news, earthquake and alert badges drawn on top of each other at the current zoom, so each can be seen and clicked. */
   private spreadMarkers() {
     const all = [...this.newsEntities, ...this.quakeEntities, ...this.alertEntities].filter((e) => e.billboard && e.position);
@@ -760,13 +795,13 @@ export class Globe {
     const scene = this.viewer.scene;
     const { clientWidth: w, clientHeight: h } = scene.canvas;
     // Only markers on screen and on the near side of the Earth can overlap what the user sees.
-    const occluder = new EllipsoidalOccluder(Ellipsoid.WGS84, this.viewer.camera.positionWC);
+    const eye = this.viewer.camera.positionWC;
     const at = all.map((e) => {
       const p = e.position!.getValue(now)!;
-      const xy = occluder.isPointVisible(p) ? SceneTransforms.worldToWindowCoordinates(scene, p) : undefined;
+      const xy = Cartesian3.dot(p, eye) > Cartesian3.magnitudeSquared(p) ? SceneTransforms.worldToWindowCoordinates(scene, p) : undefined;
       return xy && xy.x >= 0 && xy.y >= 0 && xy.x <= w && xy.y <= h ? xy : null;
     });
-    spreadOffsets(at).forEach(([x, y], i) => {
+    spreadOffsets(at, this.iconBase, this.iconBase / PHI).forEach(([x, y], i) => {
       all[i]!.billboard!.pixelOffset = new ConstantProperty(new Cartesian2(x, y));
     });
     this.render();
@@ -846,13 +881,13 @@ export class Globe {
       const selected = alert.id === selectedId;
       // The GDACS type picks the icon; the border and corner flag carry the alert level, red or orange.
       const level = (red ? ALERT_RED : ALERT_ORANGE).toCssColorString();
+      const position = Cartesian3.fromDegrees(alert.lon, alert.lat);
       return this.viewer.entities.add({
         id: `alert:${alert.id}`,
-        position: Cartesian3.fromDegrees(alert.lon, alert.lat),
+        position,
         billboard: {
-          image: badge(GDACS_HAZARD[alert.type] ?? "flood", level, level),
+          ...this.zoomIcon(position, (res) => badge(GDACS_HAZARD[alert.type] ?? "flood", selected ? "#ffffff" : level, level, res), iconWeight(selected || red ? 1 : 0.5)),
           pixelOffset: new Cartesian2(0, 0),
-          scale: selected ? 0.62 : 0.48,
           verticalOrigin: VerticalOrigin.CENTER,
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
         },
@@ -876,7 +911,7 @@ export class Globe {
       // Slightly above the ground so the dot is not cut by the globe; depth-tested, so the far side stays hidden.
       position: Cartesian3.fromDegrees(spot.lon, spot.lat, 2000),
       point: {
-        pixelSize: 5 + Math.min(spot.aqi, 300) / 30,
+        pixelSize: new CallbackProperty(() => (this.iconBase * (5 + Math.min(spot.aqi, 300) / 30)) / ICON_MID, false),
         color: Color.fromCssColorString(spot.colour).withAlpha(0.9),
         outlineColor: Color.BLACK.withAlpha(0.5),
         outlineWidth: 1,
@@ -889,22 +924,23 @@ export class Globe {
   setQuakes(quakes: Quake[]) {
     for (const entity of this.quakeEntities) this.viewer.entities.remove(entity);
     this.quakeEntities = quakes.map((quake) => {
-      // The badge grows with magnitude, which is also written above the strong ones.
-      const scale = Math.min(0.62, 0.26 + Math.max(0, quake.magnitude - 4) * 0.09);
+      // The badge grows with magnitude (M4 smallest, M7 largest), which is also written above the strong ones.
+      const weight = iconWeight((quake.magnitude - 5.5) / 1.5);
+      const position = Cartesian3.fromDegrees(quake.lon, quake.lat);
       return this.viewer.entities.add({
       id: `quake:${quake.id}`,
-      position: Cartesian3.fromDegrees(quake.lon, quake.lat),
+      position,
       billboard: {
-        image: badge("earthquake"),
-        scale,
+        ...this.zoomIcon(position, (res) => badge("earthquake", undefined, undefined, res), weight),
         verticalOrigin: VerticalOrigin.CENTER,
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
       label: quake.magnitude >= 5.5 ? {
+        show: this.onNearSide(position),
         text: `M${quake.magnitude.toFixed(1)}`,
         font: "11px sans-serif",
         fillColor: QUAKE_COLOR,
-        pixelOffset: new Cartesian2(0, -(BADGE_PX * scale) / 2 - 9),
+        pixelOffset: this.aboveIcon(weight, 9),
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       } : undefined,
       });
@@ -954,24 +990,25 @@ export class Globe {
     this.newsEntities = markers.map((m) => {
       const selected = m.id === selectedId;
       // Bigger the more outlets report it; faded when the story names only a country.
-      const scale = 0.32 + Math.min(m.outlets, 5) * 0.03 + (selected ? 0.14 : 0);
+      const weight = iconWeight(selected ? 1 : (Math.min(m.outlets, 5) - 3) / 2);
+      const position = Cartesian3.fromDegrees(m.lon, m.lat);
       return this.viewer.entities.add({
         id: `news:${m.id}`,
-        position: Cartesian3.fromDegrees(m.lon, m.lat),
+        position,
         billboard: {
-          image: badge(m.hazard, selected ? "#ffffff" : undefined),
-          scale,
+          ...this.zoomIcon(position, (res) => badge(m.hazard, selected ? "#ffffff" : undefined, undefined, res), weight),
           color: Color.WHITE.withAlpha(m.exact ? 1 : 0.55),
           verticalOrigin: VerticalOrigin.CENTER,
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
         },
         label: selected ? {
+          show: this.onNearSide(position),
           text: m.label,
           font: "13px sans-serif",
           fillColor: Color.WHITE,
           showBackground: true,
           backgroundColor: Color.fromCssColorString("#0b1416").withAlpha(0.85),
-          pixelOffset: new Cartesian2(0, -(BADGE_PX * scale) / 2 - 12),
+          pixelOffset: this.aboveIcon(weight, 12),
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
         } : undefined,
       });

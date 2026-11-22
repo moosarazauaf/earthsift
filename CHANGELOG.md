@@ -5,6 +5,19 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.51] - 2026-11-22
+
+### Changed
+- **New map icons** in an open-world game style: white glyphs on dark glass with
+  a neon rim, and diamonds for official alerts. Far out they become clean
+  coloured blips.
+- **Icons follow the zoom** on a golden-ratio scale: 13 px at globe view, 21 px at
+  2,000 km and a hard cap of 34 px from 200 km in.
+
+### Fixed
+- Markers on the far side of the Earth no longer show through the globe.
+- Overlapping markers now fan out; the old visibility check prevented it.
+
 ## [0.2.0-alpha.50] - 2026-11-22
 
 ### Fixed
