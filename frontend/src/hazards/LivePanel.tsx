@@ -7,8 +7,9 @@ import { useStore } from "../app/store";
 import { NewsTab } from "../news/NewsPanel";
 import { KindBadge } from "../ui/KindBadge";
 import { ALERT_TYPES, ALERT_WINDOW_DAYS, type Alert, type AlertType, HAZARD_LAYERS, yesterdayUtc } from "./sources";
+import { HazardIcon } from "../ui/HazardIcon";
+import { GDACS_HAZARD } from "../globe/pixelMarkers";
 
-const SYMBOL: Record<AlertType, string> = { FL: "≈", WF: "▲", TC: "◎", EQ: "◆", DR: "☼", VO: "▴" };
 
 function AlertRow({ alert, selected }: { alert: Alert; selected: boolean }) {
   const set = useStore((s) => s.set);
@@ -16,7 +17,7 @@ function AlertRow({ alert, selected }: { alert: Alert; selected: boolean }) {
     <li>
       <button className={selected ? "alert on" : "alert"} onClick={() => set({ selectedAlert: alert })}>
         <span className={`level level-${alert.level.toLowerCase()}`}>
-          <span aria-hidden="true">{SYMBOL[alert.type]}</span> {alert.level}
+          <HazardIcon hazard={GDACS_HAZARD[alert.type] ?? "flood"} size={18} /> {alert.level}
         </span>
         <strong>{alert.name}</strong>
         <em>

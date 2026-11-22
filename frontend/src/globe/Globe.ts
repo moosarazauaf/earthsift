@@ -74,7 +74,7 @@ const ESRI_CREDIT = "Basemap: Esri, Maxar, Earthstar Geographics, and the GIS Us
 /** Seconds for a new imagery layer to fade in over the one it replaces. */
 const FADE_SECONDS = 0.6;
 const HOME = { lon: 60, lat: 22, height: 2.2e7 };
-const AOI_COLOR = Color.fromCssColorString("#a3b18a");
+const AOI_COLOR = Color.fromCssColorString("#ff74b8");
 const DISTRICT_COLOR = Color.fromCssColorString("#d9a441");
 const LOSS_COLOR = Color.fromCssColorString("#d0703f");
 const GAIN_COLOR = Color.fromCssColorString("#8db85a");
@@ -972,8 +972,8 @@ export class Globe {
     if (points.length >= 1) {
       const positions = points.map(([lon, lat]) => Cartesian3.fromDegrees(lon, lat));
       this.measureEntity = this.viewer.entities.add({
-        polyline: { positions: positions.length > 1 ? positions : [positions[0]!, positions[0]!], width: 3, material: Color.fromCssColorString("#5fd0c5"), clampToGround: true },
-        polygon: points.length >= 3 ? { hierarchy: positions, material: Color.fromCssColorString("#5fd0c5").withAlpha(0.12) } : undefined,
+        polyline: { positions: positions.length > 1 ? positions : [positions[0]!, positions[0]!], width: 3, material: AOI_COLOR, clampToGround: true },
+        polygon: points.length >= 3 ? { hierarchy: positions, material: AOI_COLOR.withAlpha(0.12) } : undefined,
       });
     }
     this.render();

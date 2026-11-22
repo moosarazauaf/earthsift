@@ -35,6 +35,7 @@ import { RISES, type RiseResult, riseOverlay } from "./rise";
 import { type Hour, WET_BULB_DANGER, WET_BULB_HEAVY, fetchFieldHours, heatWindows, sprayWindows, windowText } from "./fieldwork";
 import { type SolarProfile, YIELD_FACTOR, fetchSolar } from "./solar";
 import { type CloudHours, type OutlookDay, cleanestWindow, cloudAt, cloudWords, dayName, fetchCloudHours, fetchOutlook, warnings, waterBalance } from "./outlook";
+import { Icon } from "../ui/Icon";
 
 const SIZES = [2, 5, 10, 25] as const;
 const NEWS_KM = 150;
@@ -95,7 +96,7 @@ function Overview() {
         <p className="eyebrow">{t("area.eyebrow")}</p>
         <h2 className="story-title">{aoi.label}</h2>
         <div className="row-actions">
-          <button onClick={saveCurrentPlace} disabled={saved} title="Keep this area in My places, in this browser (Shift+S)">{saved ? t("area.saved") : t("area.save")}</button>
+          <button onClick={saveCurrentPlace} disabled={saved} title="Keep this area in My places, in this browser (Shift+S)"><Icon name="star" filled={saved} /> {saved ? t("area.saved") : t("area.save")}</button>
           <button onClick={printReport} disabled={printing} title="Print every part of this overview, or save it as a PDF">{printing ? "Preparing…" : t("area.print")}</button>
           {centre && <button onClick={() => void shareText(aoi.label, overviewLink(centre, size))} title="Send a link that opens this overview">Share</button>}
         </div>
@@ -231,7 +232,7 @@ function CompareWith({ label }: { label: string }) {
   return (
     <section className="compare-with">
       <button onClick={() => set({ agentOpen: true, introOpen: false, agentDraft: { text: `compare ${label.replace(/^\d+ km around /, "")} and [place]`, send: false } })}>
-        ⚖️ Compare with another place
+        <Icon name="scale" /> Compare with another place
       </button>
     </section>
   );

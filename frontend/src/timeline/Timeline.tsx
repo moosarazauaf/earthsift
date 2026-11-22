@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FIRST_YEAR, currentYear } from "../app/logic";
 import { type CompareMode, useStore } from "../app/store";
 import { Credit } from "../ui/Credit";
+import { Icon } from "../ui/Icon";
 
 /** Time each year stays on screen during playback; tiles need a moment to arrive. */
 const PLAY_INTERVAL_MS = 2200;
@@ -41,7 +42,7 @@ export function Timeline() {
       <div className="timeline-main">
         <button className="icon-btn" onClick={() => { if (!playing && year >= last) setYear(FIRST_YEAR); setPlaying(!playing); }}
           aria-label={playing ? "Pause playback" : "Play through the years"}>
-          {playing ? "❚❚" : "▶"}
+          {playing ? <Icon name="pause" /> : <Icon name="play" filled />}
         </button>
         <output className="year" aria-live="polite">{year}</output>
         <div className="track">

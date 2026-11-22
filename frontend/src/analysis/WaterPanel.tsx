@@ -11,6 +11,7 @@ import { downloadText } from "./download";
 import { ShareRunButton } from "./SharedRun";
 import { MethodsButton, ResultHeader } from "./Results";
 import { WaterSeriesChart } from "./charts";
+import { Icon } from "../ui/Icon";
 
 const SEASONS = [
   { id: "year", label: "Whole year", start: 1, end: 12 },
@@ -137,7 +138,7 @@ export function YearPlayer({ years }: { years: number[] }) {
     <div className="player">
       <button className="icon-btn" aria-label={playing ? "Pause" : "Play through the years"}
         onClick={() => { if (!playing) setOverlay({ key: `y${years[index >= 0 && index < years.length - 1 ? index : 0]}` }); setPlaying(!playing); }}>
-        {playing ? "❚❚" : "▶"}
+        {playing ? <Icon name="pause" /> : <Icon name="play" filled />}
       </button>
       <div className="seg" role="radiogroup" aria-label="Year shown on the globe">
         {years.map((y) => (

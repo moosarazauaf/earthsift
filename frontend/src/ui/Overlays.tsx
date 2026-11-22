@@ -9,6 +9,7 @@ import { STORED_ANALYSIS, STORED_FLOOD } from "../demo/stored";
 import { exploreEvidence, startLahoreTour, stopTour } from "../demo/lahore";
 import { AnalysisList } from "./TopBar";
 import { useT } from "../i18n";
+import { Icon, type IconName } from "./Icon";
 
 const NOTICE_SECONDS = 6;
 
@@ -17,15 +18,15 @@ const NOTICE_SECONDS = 6;
  * with the question written out and "[place]" selected to type over, except
  * "what is happening now", which needs no place.
  */
-const PROBLEMS: { icon: string; who: string; question: string; answer: string; draft?: string }[] = [
-  { icon: "🏡", who: "Land buyers, farmers, builders", question: "Is this land safe to build on or buy?", answer: "Flooding since 1984, landslide-prone slopes, the week ahead and the nearest higher ground.", draft: "Is [place] safe? Risk check" },
-  { icon: "🌊", who: "Disaster and aid teams", question: "Where did the flood reach, and who lives there?", answer: "A Sentinel-1 radar flood map that sees through cloud, with people affected.", draft: "Map the floods in [place] from [start date] to [end date]" },
-  { icon: "🔴", who: "Everyone", question: "What is happening right now?", answer: "Today's floods, fires, storms and earthquakes, checked against the agencies." },
-  { icon: "🌤️", who: "Families, farmers, health workers", question: "Is the coming week safe?", answer: "Heavy rain, heat, frost, gales and unhealthy air in the next 7 days, and the cleanest hours.", draft: "What is the weather outlook for [place]?" },
-  { icon: "🌳", who: "Climate and forestry projects", question: "How much carbon does this land hold?", answer: "Carbon in plants and soil, with uncertainty, and a chart ready for a report.", draft: "Carbon stock of [place]" },
-  { icon: "🏙️", who: "Planners and journalists", question: "How has this place changed?", answer: "A time-lapse video since 1985, city growth, lost trees and shrinking water.", draft: "Make a time-lapse of [place]" },
-  { icon: "🗺️", who: "Students and researchers", question: "I need maps and figures for my report", answer: "Land cover, slope and terrain maps, with charts as SVG or 300 dpi PNG.", draft: "Land cover of [place]" },
-  { icon: "📐", who: "GIS users", question: "Buffer, terrain, export to QGIS", answer: "Buffers, hillshade, slope and aspect, area and perimeter, GeoJSON and KML.", draft: "Buffer 5 km around [place]" },
+const PROBLEMS: { icon: IconName; who: string; question: string; answer: string; draft?: string }[] = [
+  { icon: "home", who: "Land buyers, farmers, builders", question: "Is this land safe to build on or buy?", answer: "Flooding since 1984, landslide-prone slopes, the week ahead and the nearest higher ground.", draft: "Is [place] safe? Risk check" },
+  { icon: "wave", who: "Disaster and aid teams", question: "Where did the flood reach, and who lives there?", answer: "A Sentinel-1 radar flood map that sees through cloud, with people affected.", draft: "Map the floods in [place] from [start date] to [end date]" },
+  { icon: "live", who: "Everyone", question: "What is happening right now?", answer: "Today's floods, fires, storms and earthquakes, checked against the agencies." },
+  { icon: "weather", who: "Families, farmers, health workers", question: "Is the coming week safe?", answer: "Heavy rain, heat, frost, gales and unhealthy air in the next 7 days, and the cleanest hours.", draft: "What is the weather outlook for [place]?" },
+  { icon: "tree", who: "Climate and forestry projects", question: "How much carbon does this land hold?", answer: "Carbon in plants and soil, with uncertainty, and a chart ready for a report.", draft: "Carbon stock of [place]" },
+  { icon: "city", who: "Planners and journalists", question: "How has this place changed?", answer: "A time-lapse video since 1985, city growth, lost trees and shrinking water.", draft: "Make a time-lapse of [place]" },
+  { icon: "map", who: "Students and researchers", question: "I need maps and figures for my report", answer: "Land cover, slope and terrain maps, with charts as SVG or 300 dpi PNG.", draft: "Land cover of [place]" },
+  { icon: "ruler", who: "GIS users", question: "Buffer, terrain, export to QGIS", answer: "Buffers, hillshade, slope and aspect, area and perimeter, GeoJSON and KML.", draft: "Buffer 5 km around [place]" },
 ];
 
 export function Intro() {
@@ -53,7 +54,7 @@ export function Intro() {
             {PROBLEMS.map((p) => (
               <button key={p.question} className={p.draft ? "" : "now"}
                 onClick={() => (p.draft ? askSentri(p.draft, false) : set({ introOpen: false, mode: "live", liveTab: "news" }))}>
-                <span className="who"><span aria-hidden="true">{p.icon}</span> {p.who}</span>
+                <span className="who"><Icon name={p.icon} /> {p.who}</span>
                 <strong>{p.question}</strong>
                 <span className="answer">{p.answer}</span>
               </button>

@@ -34,7 +34,7 @@ const FACES: Record<"open" | "blink" | "happy" | "up", string[]> = {
 const FACE_TOP = 4;
 
 const COLOURS: Record<string, string> = {
-  o: "#4f5d3b", b: "#a3b18a", h: "#d6dcc4", p: "#6a9ab0", q: "#3d5a68", a: "#8a8576",
+  o: "#5b2a70", b: "#ff74b8", h: "#ffd9e8", p: "#ffb35c", q: "#8a3ffc", a: "#8a8576",
   l: "#d9a441", d: "#c9c0ae", e: "#14120e", c: "#d0703f", m: "#14120e",
 };
 

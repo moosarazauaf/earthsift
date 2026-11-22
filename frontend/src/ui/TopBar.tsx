@@ -16,6 +16,7 @@ import { interpret } from "../ask/interpret";
 import { bestPlace, requestRun } from "../ask/request";
 import { districtAt } from "../area/districts";
 import { PIXEL_BUDGET, deviceProfile } from "../engine/client";
+import { Icon } from "./Icon";
 
 /** Three entries for a newcomer: what is happening, look around, measure something. */
 const MODES = [
@@ -67,7 +68,7 @@ function AnalyseMenu() {
     <>
       <button ref={button} className={active ? "on" : ""} aria-haspopup="menu" aria-expanded={open}
         onClick={() => { setLeft(button.current?.getBoundingClientRect().left ?? 0); setOpen(!open); }}>
-        {active ? t("nav.analyseActive", { name: t(`label.${active.id}`) }) : t("nav.analyse")} <span aria-hidden="true">▾</span>
+        {active ? t("nav.analyseActive", { name: t(`label.${active.id}`) }) : t("nav.analyse")} <Icon name="chevron" size={13} />
       </button>
       {open && createPortal(
         <div ref={menu} className="analyse-menu" style={{ left }} role="dialog" aria-label={t("menu.title")}>
@@ -229,13 +230,13 @@ export function TopBar() {
       <button className={drawTool === "measure" ? "ghost measure-btn on" : "ghost measure-btn"} aria-pressed={drawTool === "measure"}
         onClick={() => set(drawTool === "measure" ? { drawTool: "none" } : { drawTool: "measure", measure: [], introOpen: false })}
         title="Measure a distance or an area (D)" aria-label="Measure">
-        <span aria-hidden="true">📏</span>
+        <Icon name="ruler" />
       </button>
       <button className="ghost reset" onClick={() => void getGlobe()?.resetView()} title="Back to the whole Earth" aria-label="Reset view">
-        <span aria-hidden="true">⟲</span><span className="label"> Reset view</span>
+        <Icon name="reset" /><span className="label"> Reset view</span>
       </button>
       <button className="ghost places-btn" onClick={() => set({ placesOpen: true })} title="My places: saved areas and recent analyses (M)" aria-label="My places">
-        <span aria-hidden="true">★</span><span className="label"> {t("top.places")}</span>
+        <Icon name="star" filled /><span className="label"> {t("top.places")}</span>
         {watchedCount > 0 && <span className="badge" aria-label={`${watchedCount} of your places have hazards nearby`}>{watchedCount}</span>}
       </button>
       <button className="ghost" onClick={share} title="Copy a link to this view (S)">{t("top.share")}</button>

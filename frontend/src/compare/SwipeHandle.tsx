@@ -2,6 +2,7 @@
 import { type KeyboardEvent, type PointerEvent, useRef } from "react";
 
 import { useStore } from "../app/store";
+import { Icon } from "../ui/Icon";
 
 const KEY_STEP = 0.02;
 
@@ -34,7 +35,7 @@ export function SwipeHandle() {
       onPointerDown={onPointerDown} onPointerMove={onPointerMove}
       onPointerUp={() => { dragging.current = false; }} onKeyDown={onKeyDown}>
       <span className="swipe-label left">{compare.year}</span>
-      <span className="swipe-grip" aria-hidden="true">⇆</span>
+      <span className="swipe-grip" aria-hidden="true"><Icon name="swap" size={13} /></span>
       <span className="swipe-label right">{year}</span>
     </div>
   );

@@ -6,6 +6,7 @@ import { useStore } from "../app/store";
 import { clearRecent, isSaved } from "../area/saved";
 import { type NearbyItem, WATCH_KM, useWatchedPlaces } from "../area/watch";
 import { ago } from "../news/hazards";
+import { Icon } from "./Icon";
 
 export function MyPlaces() {
   const open = useStore((s) => s.placesOpen);
@@ -43,10 +44,10 @@ export function MyPlaces() {
       <section>
         <h3>Saved areas</h3>
         {aoi && !isSaved(places, aoi.geometry) && (
-          <button onClick={saveCurrentPlace}>☆ Save the current area: {aoi.label}</button>
+          <button onClick={saveCurrentPlace}><Icon name="star" /> Save the current area: {aoi.label}</button>
         )}
         {places.length === 0 ? (
-          <p className="muted">No saved areas yet. Open any area and press ☆ Save, or S with Shift.</p>
+          <p className="muted">No saved areas yet. Open any area and press Save, or S with Shift.</p>
         ) : (
           <ul className="place-list">
             {places.map((p) => (

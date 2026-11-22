@@ -5,6 +5,19 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.52] - 2026-11-22
+
+### Changed
+- **One design system across the app** (`src/design.css`): dark glass lit by a dusk
+  neon, matching the map markers, with one shape each for buttons, tabs, inputs,
+  chips and cards, on a Fibonacci scale.
+- **Panel hazard icons now match the map**: same glyphs, glass disc and neon rim.
+- Emoji and text symbols replaced by one drawn icon set (`ui/Icon.tsx`).
+
+### Fixed
+- Overview tab names are no longer cut off.
+- The phone top bar no longer lets its second row sit over the map.
+
 ## [0.2.0-alpha.51] - 2026-11-22
 
 ### Changed

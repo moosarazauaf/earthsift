@@ -7,6 +7,7 @@ import { CAN_RUN, COMING, pickExamples } from "./args";
 import type { Finding } from "./s1checks";
 import { type Mood, Sentri } from "./Sentri";
 import { BarChart } from "../ui/Figure";
+import { Icon, type IconName } from "../ui/Icon";
 
 interface Entry { who: "you" | "sentri"; text: string; cards?: Card[]; warn?: boolean; next?: string[] }
 
@@ -37,12 +38,12 @@ const STATUS: Record<Mood, string> = {
   warn: "Found something to check",
 };
 
-const MARK: Record<Finding["level"], string> = { ok: "✓", warn: "!", error: "✕" };
+const MARK = { ok: "check", warn: "alert", error: "close" } as const satisfies Record<Finding["level"], IconName>;
 
 function Findings({ findings }: { findings: Finding[] }) {
   return (
     <ul className="findings">
-      {findings.map((f, i) => <li key={i} className={f.level}><span aria-label={f.level}>{MARK[f.level]}</span> {f.text}</li>)}
+      {findings.map((f, i) => <li key={i} className={f.level}><span role="img" aria-label={f.level}><Icon name={MARK[f.level]} size={13} /></span> {f.text}</li>)}
     </ul>
   );
 }
@@ -146,7 +147,7 @@ export function AgentPanel() {
           <p className="agent-status" role="status"><span className={`dot ${mood}`} aria-hidden="true" />{STATUS[mood]}</p>
         </div>
         <div className="agent-actions">
-          {entries.length > 0 && <button className="ghost" onClick={clearChat} title="Clear this chat and start a new one" aria-label="Clear chat">🗑</button>}
+          {entries.length > 0 && <button className="ghost" onClick={clearChat} title="Clear this chat and start a new one" aria-label="Clear chat"><Icon name="trash" /></button>}
           <button className="ghost" onClick={() => set({ agentOpen: false })} aria-label="Close Sentri">×</button>
         </div>
       </header>
@@ -195,12 +196,12 @@ export function AgentPanel() {
       <form onSubmit={send}>
         <textarea ref={input} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onKey} rows={2} maxLength={20_000}
           placeholder="Floods in Layyah, August 2022… or paste a script" aria-label="Message to Sentri" />
-        <button type="submit" disabled={busy || !text.trim()} aria-label="Send">➤</button>
+        <button type="submit" disabled={busy || !text.trim()} aria-label="Send"><Icon name="send" /></button>
       </form>
       <p className="muted small">
         {agentOnline
-          ? "Sentri runs on a free NVIDIA Nemotron model through OpenRouter, which reads what you type. Numbers, dates and checks come from Earthsift's own code. The chat is kept in this browser only; 🗑 clears it."
-          : "Built-in reader on this build (no language model). The chat is kept in this browser only; 🗑 clears it."}
+          ? "Sentri runs on a free NVIDIA Nemotron model through OpenRouter, which reads what you type. Numbers, dates and checks come from Earthsift's own code. The chat is kept in this browser only; the bin button clears it."
+          : "Built-in reader on this build (no language model). The chat is kept in this browser only; the bin button clears it."}
       </p>
     </aside>
   );
