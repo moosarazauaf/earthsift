@@ -17,6 +17,7 @@ import { bestPlace, requestRun } from "../ask/request";
 import { districtAt } from "../area/districts";
 import { PIXEL_BUDGET, deviceProfile } from "../engine/client";
 import { Icon } from "./Icon";
+import { Logo } from "./Logo";
 
 /** Three entries for a newcomer: what is happening, look around, measure something. */
 const MODES = [
@@ -191,10 +192,7 @@ export function TopBar() {
   return (
     <header className="topbar">
       <button className="brand" onClick={() => set({ introOpen: true })} aria-label="Earthsift home">
-        <svg viewBox="0 0 32 32" aria-hidden="true">
-          <circle cx="16" cy="16" r="13" />
-          <path d="M4 16h7l3-7 4 14 3-7h7" />
-        </svg>
+        <Logo />
         <span><strong>EARTHSIFT</strong><em>See what is changing on Earth.</em></span>
       </button>
 

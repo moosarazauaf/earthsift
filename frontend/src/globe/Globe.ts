@@ -74,7 +74,7 @@ const ESRI_CREDIT = "Basemap: Esri, Maxar, Earthstar Geographics, and the GIS Us
 /** Seconds for a new imagery layer to fade in over the one it replaces. */
 const FADE_SECONDS = 0.6;
 const HOME = { lon: 60, lat: 22, height: 2.2e7 };
-const AOI_COLOR = Color.fromCssColorString("#ff74b8");
+const AOI_COLOR = Color.fromCssColorString("#6ea8fe");
 const DISTRICT_COLOR = Color.fromCssColorString("#d9a441");
 const LOSS_COLOR = Color.fromCssColorString("#d0703f");
 const GAIN_COLOR = Color.fromCssColorString("#8db85a");

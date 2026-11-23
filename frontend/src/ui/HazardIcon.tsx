@@ -1,9 +1,7 @@
 /**
- * A hazard's icon in the panels: the same glyph, glass disc and neon rim as its
- * marker on the map, so a colour and shape learned in one place holds in the other.
+ * A hazard's icon in the panels: a plain line drawing in the hazard's colour, to
+ * suit the dashboard. The map markers (globe/pixelMarkers) draw the same glyphs in their own style.
  */
-import { useId } from "react";
-
 import { HAZARD_INFO } from "../news/hazards";
 import type { Hazard } from "../news/types";
 
@@ -24,25 +22,12 @@ export const GLYPHS: Record<Hazard, { fill?: string; line?: string }> = {
   dust: { line: "M2 8h12a3 3 0 1 0-3-3M2 13h17a3 3 0 1 1-3 3M2 18h8" },
 };
 
-export function HazardIcon({ hazard, size = 21 }: { hazard: Hazard; size?: number }) {
-  const id = useId();
+export function HazardIcon({ hazard, size = 16 }: { hazard: Hazard; size?: number }) {
   const colour = HAZARD_INFO[hazard].colour, glyph = GLYPHS[hazard];
   return (
-    <svg className="hazard-icon" width={size} height={size} viewBox="0 0 34 34" aria-hidden="true">
-      <defs>
-        <linearGradient id={`${id}r`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={colour} /><stop offset="0.618" stopColor={colour} /><stop offset="1" stopColor="#ff2d95" />
-        </linearGradient>
-        <radialGradient id={`${id}g`} cx="0.5" cy="0.19" r="0.81">
-          <stop offset="0" stopColor="#3a2147" /><stop offset="1" stopColor="#0d0914" />
-        </radialGradient>
-      </defs>
-      <circle cx="17" cy="17" r="16" fill={`url(#${id}r)`} />
-      <circle cx="17" cy="17" r="13.7" fill={`url(#${id}g)`} />
-      <g transform="translate(7.1 7.1) scale(0.825)" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-        {glyph.fill && <path d={glyph.fill} fill="#fff" stroke="none" />}
-        {glyph.line && <path d={glyph.line} />}
-      </g>
+    <svg className="hazard-icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={colour} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {glyph.fill && <path d={glyph.fill} fill={colour} stroke="none" />}
+      {glyph.line && <path d={glyph.line} />}
     </svg>
   );
 }

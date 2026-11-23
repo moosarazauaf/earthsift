@@ -46,8 +46,11 @@ export function badge(hazard: Hazard, border?: string, flag?: string, res = 68):
   const colour = border ?? HAZARD_INFO[hazard].colour;
   if (res < 50) {
     ctx.fillStyle = "#0d0914"; outline(R); ctx.fill();
-    ctx.fillStyle = colour; outline(R * (flag ? 0.72 : 0.8)); ctx.fill();
-    ctx.fillStyle = "#ffffff"; outline(R / PHI ** 2); ctx.fill();
+    const ring = ctx.createLinearGradient(c - R, c - R, c + R, c + R);
+    ring.addColorStop(0, colour); ring.addColorStop(1 / PHI, colour); ring.addColorStop(1, border === "#ffffff" ? "#ffffff" : NEON);
+    ctx.fillStyle = ring; outline(R * (flag ? 0.8 : 0.86)); ctx.fill();
+    ctx.fillStyle = "#0d0914"; outline(R * (flag ? 0.46 : 0.5)); ctx.fill();
+    ctx.fillStyle = "#ffffff"; outline(R / PHI ** 3); ctx.fill();
     cache.set(key, canvas);
     return canvas;
   }

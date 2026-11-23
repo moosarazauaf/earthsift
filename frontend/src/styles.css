@@ -90,8 +90,6 @@ input[type="checkbox"] { accent-color: var(--cyan); }
 }
 .brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; text-align: left; }
 .brand svg { width: 30px; height: 30px; fill: none; stroke-width: 2; stroke-linejoin: round; }
-.brand circle { stroke: var(--cyan); }
-.brand path { stroke: var(--green); }
 .brand strong { display: block; letter-spacing: 0.22em; font-size: 14px; }
 .brand em { display: block; font-style: normal; font-size: 11px; color: var(--muted); }
 .topbar nav { display: flex; gap: 2px; flex: 1; overflow-x: auto; }

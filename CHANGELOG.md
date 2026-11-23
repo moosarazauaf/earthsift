@@ -5,6 +5,16 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.53] - 2026-11-23
+
+### Changed
+- **The interface is now a plain scientific dashboard**: slate surfaces, one blue
+  accent, flat panels, underlined tabs and a table-like risk check.
+- **New logo and a redrawn Sentri** in a dusk palette, which is now used only by
+  them and the map markers. App icons and the favicon use the new logo.
+- Side-panel hazard icons are plain line drawings in each hazard's colour.
+- Map markers keep their neon rim when zoomed out.
+
 ## [0.2.0-alpha.52] - 2026-11-22
 
 ### Changed

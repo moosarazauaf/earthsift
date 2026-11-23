@@ -17,7 +17,7 @@ function AlertRow({ alert, selected }: { alert: Alert; selected: boolean }) {
     <li>
       <button className={selected ? "alert on" : "alert"} onClick={() => set({ selectedAlert: alert })}>
         <span className={`level level-${alert.level.toLowerCase()}`}>
-          <HazardIcon hazard={GDACS_HAZARD[alert.type] ?? "flood"} size={18} /> {alert.level}
+          <HazardIcon hazard={GDACS_HAZARD[alert.type] ?? "flood"} /> {alert.level}
         </span>
         <strong>{alert.name}</strong>
         <em>
