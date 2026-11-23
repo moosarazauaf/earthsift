@@ -5,6 +5,20 @@ All notable changes are recorded here. Versions follow
 
 ## [Unreleased]
 
+## [0.2.0-alpha.54] - 2026-11-23
+
+### Added
+- **Live console on the map**: a UTC clock and one switch per feed, each with its
+  live count (earthquakes, NASA natural events, alerts, news, satellites).
+- **NASA EONET natural events** active in the past 30 days, with a card for each.
+
+### Changed
+- **Live now opens full**: earthquakes are on by default and reach down to M2.5.
+  Shocks below M4.5 are drawn on the map only, so they never confirm a news story
+  or trigger a watched place.
+- **Instrument-console look**, inspired by God's Eye View: near-black surfaces,
+  hairlines, one signal-cyan accent, JetBrains Mono for labels and readings.
+
 ## [0.2.0-alpha.53] - 2026-11-23
 
 ### Changed

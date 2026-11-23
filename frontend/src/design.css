@@ -1,38 +1,41 @@
-/* Earthsift interface: a plain scientific dashboard. Neutral slate surfaces, one blue accent, no glow,
-   so the data and the map carry the colour. Only the logo, Sentri and the map markers use the dusk palette.
+/* Earthsift interface: a scientific instrument console. Near-black surfaces, hairlines, one signal-cyan
+   accent, prose in Inter and every reading in JetBrains Mono, so the data and the map carry the colour. Only the logo, Sentri and the map markers use the dusk palette.
    Sizes are Fibonacci numbers: text 11 / 13 / 21 / 34, space 3 / 5 / 8 / 13 / 21.
    Colour keeps one meaning each: --cyan is the selection accent (the name is historical),
    green = increase, orange = decrease, blue = water, amber = change, violet = modelled, red = danger.
    Screen only, so the printed report keeps its plain white tokens. */
 @media screen and (prefers-contrast: no-preference) {
   :root {
-    --bg: #0f1419;
-    --panel: rgba(22, 28, 35, 0.97);
-    --panel-solid: #161c23;
-    --raised: #1d252e;
-    --raised-strong: #27313c;
-    --line: rgba(148, 163, 184, 0.16);
-    --line-strong: rgba(148, 163, 184, 0.3);
-    --text: #e6ebf0;
-    --muted: #9aa8b6;
-    --cyan: #6ea8fe;
-    --action: #2b6fc4;
-    --action-hover: #3580dc;
+    --bg: #070a0e;
+    --panel: rgba(11, 15, 20, 0.94);
+    --panel-solid: #0c1116;
+    --raised: #121920;
+    --raised-strong: #1b252e;
+    --line: rgba(132, 160, 180, 0.15);
+    --line-strong: rgba(132, 160, 180, 0.3);
+    --text: #e4eaee;
+    --muted: #91a0ad;
+    --cyan: #4fd1e0;
+    --action: #4fd1e0;
+    --on-action: #04181c;
+    --action-hover: #7ce3ef;
     --green: #4fbf8b;
     --amber: #e0a93b;
     --orange: #e5804b;
-    --blue: #38b6e8;
+    --blue: #4da3ff;
+    --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, Consolas, monospace;
+    --code: var(--mono);
     --violet: #a78bfa;
     --red: #e5534b;
-    --radius-sm: 3px;
-    --radius: 5px;
-    --radius-lg: 8px;
+    --radius-sm: 2px;
+    --radius: 3px;
+    --radius-lg: 5px;
   }
 }
 
 @media screen {
   body { background: var(--bg); }
-  ::selection { background: rgba(110, 168, 254, 0.35); }
+  ::selection { background: rgba(79, 209, 224, 0.32); }
   * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
   :focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
   .ui-icon { vertical-align: -0.2em; flex: none; }
@@ -66,7 +69,7 @@
   button:hover:not(:disabled), .button:hover { background: var(--raised-strong); border-color: var(--line-strong); }
   button:disabled { opacity: 0.42; }
   button.primary, .intro-ask button[type="submit"], .agent form button[type="submit"] {
-    background: var(--action); border-color: var(--action); color: #fff; font-weight: 600;
+    background: var(--action); border-color: var(--action); color: var(--on-action); font-weight: 650;
   }
   button.primary:hover:not(:disabled), .intro-ask button[type="submit"]:hover:not(:disabled), .agent form button[type="submit"]:hover:not(:disabled) {
     background: var(--action-hover); border-color: var(--action-hover);
@@ -79,7 +82,7 @@
 
   /* ---- selected ---- */
   .seg button.on, .options button.on, .regions button.on, .chips button.on, button.ghost.on, [role="tab"][aria-selected="true"] {
-    background: rgba(110, 168, 254, 0.14); border-color: var(--cyan); color: #fff;
+    background: rgba(79, 209, 224, 0.12); border-color: var(--cyan); color: #fff;
   }
   .topbar nav button { color: var(--muted); border-color: transparent; background: none; border-radius: var(--radius); }
   .topbar nav button:hover:not(:disabled) { color: var(--text); background: var(--raised-strong); border-color: transparent; }
@@ -103,12 +106,12 @@
   }
   input:focus, select:focus, textarea:focus, .search input[type="search"]:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
   input::placeholder, textarea::placeholder { color: #7f8d9b; }
-  input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color: #4a8fe0; }
+  input[type="range"], input[type="checkbox"], input[type="radio"] { accent-color: #4fd1e0; }
   .window { border-color: var(--line); border-radius: var(--radius); }
 
   /* ---- labels ---- */
   .kind, .tag { border-radius: var(--radius-sm); font-family: var(--sans); font-weight: 600; }
-  .badge { background: var(--action); color: #fff; border-radius: var(--radius-sm); font-weight: 600; }
+  .badge { background: var(--action); color: var(--on-action); border-radius: var(--radius-sm); font-weight: 600; }
   .level { display: inline-flex; align-items: center; gap: 5px; }
 
   /* ---- risk check: a table-like list ---- */
@@ -133,10 +136,62 @@
   .sentri { image-rendering: auto; }
   .sentri-launcher { background: var(--panel-solid); border-color: var(--line-strong); border-radius: var(--radius-lg); box-shadow: 0 3px 13px rgba(0, 0, 0, 0.34); }
   .sentri-launcher:hover:not(:disabled) { background: var(--raised-strong); border-color: var(--line-strong); }
-  .swipe-grip { background: var(--action); color: #fff; border: 0; }
+  .swipe-grip { background: var(--action); color: var(--on-action); border: 0; }
+
+  /* ---- type: prose in Inter, labels and readings in mono ---- */
+  .eyebrow, .panel-toggle, .field > span, .window legend, .panel h3, .kind, .tag, .risk .level, .topbar nav button, .area-tabs button, .tabs button, .brand strong {
+    font-family: var(--mono); font-feature-settings: "zero" 1;
+  }
+  .eyebrow, .panel-toggle, .field > span, .window legend, .panel h3 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .panel-toggle { color: var(--text); }
+  .topbar nav button { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .area-tabs button { font-size: 11px; letter-spacing: 0.02em; text-transform: uppercase; }
+  .tabs button { font-size: 11px; letter-spacing: 0; }
+  .year, .stat strong, .ticks span, .aoi-line, .readout { font-family: var(--mono); font-feature-settings: "zero" 1; }
+  .panel h2, .intro h1 { font-family: var(--sans); text-transform: none; letter-spacing: -0.014em; color: var(--text); }
+
+  /* ---- instrument frame: corner ticks on panels, thirds and centre marks on the view ---- */
+  .panel::before, .panel::after, .intro::before, .intro::after { content: ""; position: absolute; width: 8px; height: 8px; pointer-events: none; z-index: 1; }
+  .panel::before, .intro::before { top: -1px; left: -1px; border-top: 1px solid var(--cyan); border-left: 1px solid var(--cyan); }
+  .panel::after, .intro::after { right: -1px; bottom: -1px; border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan); }
+  .grid-overlay {
+    display: block; inset: var(--top) 0 var(--bottom); opacity: 0.6; mask-image: none;
+    background-image: linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong));
+    background-size: 1px 13px, 1px 13px, 1px 13px, 1px 13px, 21px 1px, 1px 21px;
+    background-position: 33.333% 0, 66.667% 0, 33.333% 100%, 66.667% 100%, 50% 50%, 50% 50%;
+    background-repeat: no-repeat;
+  }
+
+  /* ---- Live console ---- */
+  .live-hud {
+    position: fixed; left: 50%; top: calc(var(--top) + 8px); transform: translateX(-50%); z-index: 5;
+    display: flex; align-items: stretch; max-width: min(calc(100vw - 720px), 860px); overflow-x: auto; scrollbar-width: none;
+    background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--radius); box-shadow: 0 3px 13px rgba(0, 0, 0, 0.45);
+    font-family: var(--mono); font-size: 11px;
+  }
+  .hud-clock { display: flex; align-items: center; gap: 5px; padding: 0 13px; white-space: nowrap; color: var(--cyan); font-weight: 650; letter-spacing: 0.06em; border-right: 1px solid var(--line-strong); }
+  .hud-clock time { color: var(--text); font-weight: 500; letter-spacing: 0; }
+  .hud-clock i { width: 5px; height: 5px; border-radius: 50%; background: var(--red); animation: hud-pulse 1.618s ease-in-out infinite; }
+  @keyframes hud-pulse { 50% { opacity: 0.25; } }
+  .live-hud .hud-feed {
+    display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 8px; white-space: nowrap; background: none;
+    border: 0; border-right: 1px solid var(--line); border-radius: 0; color: var(--muted); opacity: 0.55; font-weight: 500;
+  }
+  .live-hud .hud-feed:last-child { border-right: 0; }
+  .live-hud .hud-feed.on { color: var(--text); opacity: 1; }
+  .live-hud .hud-feed:hover:not(:disabled) { background: var(--raised-strong); border-color: var(--line); }
+  .live-hud .hud-feed b { color: var(--cyan); font-weight: 650; }
+  .live-hud .hud-feed:not(.on) b { color: inherit; }
+  .app:has(.live-hud) .notice { top: calc(var(--top) + 52px); }
 }
 
 /* The phone top bar has two rows; the older golden-ratio pass had reset its height to one. */
 @media screen and (max-width: 800px) {
   :root { --top: 92px; }
+  .grid-overlay { display: none; }
+  .live-hud { top: calc(var(--top) + 3px); left: 8px; right: 8px; transform: none; max-width: none; }
+}
+@media screen and (min-width: 801px) and (max-width: 1280px) {
+  .live-hud { max-width: calc(100vw - 24px); }
+  .app:has(.panel.left:not(.collapsed)) .live-hud, .app:has(.panel.right:not(.collapsed)) .live-hud { max-width: calc(100vw - 720px); }
 }

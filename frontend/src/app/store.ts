@@ -11,6 +11,7 @@ import type { HeatRequest } from "../engine/heat";
 import type { ClassifyRequest } from "../engine/classify";
 import type { DisturbanceRequest } from "../engine/disturbance";
 import type { WaterRequest } from "../engine/water";
+import { type NaturalEvent, fetchEvents } from "../hazards/events";
 import { type Alert, type Quake, fetchAlerts, fetchQuakes } from "../hazards/sources";
 import { type CityAir, fetchCityAir } from "../area/air";
 import type { District } from "../area/districts";
@@ -112,6 +113,14 @@ interface State {
   /** Earthquakes of the past week; null until loaded, shown when `quakesOn`. */
   quakes: Quake[] | null;
   quakesOn: boolean;
+  /** M2.5 to 4.5: drawn on the map only, so small shocks never count as confirming a news story or a watched place. */
+  minorQuakes: Quake[];
+  /** Natural events NASA lists as active; null until loaded. */
+  events: NaturalEvent[] | null;
+  selectedEvent: NaturalEvent | null;
+  /** Live feeds switched off on the map. */
+  liveHidden: string[];
+  loadEvents: () => Promise<void>;
   /** While the week is being replayed, the moment reached (ms since 1970); earthquakes after it are hidden. */
   quakeReplay: number | null;
   /** Air quality now at major cities; null until loaded, shown on the globe while `airOn`. */
@@ -320,7 +329,11 @@ export const useStore = create<State>((set, get) => {
     // Fire detections cover the globe in crop-burning dots; they are one click away, not the default.
     hazardLayers: [],
     quakes: null,
-    quakesOn: false,
+    quakesOn: true,
+    minorQuakes: [],
+    events: null,
+    selectedEvent: null,
+    liveHidden: [],
     quakeReplay: null,
     cityAir: null,
     district: null,
@@ -351,9 +364,17 @@ export const useStore = create<State>((set, get) => {
     },
     loadQuakes: async () => {
       try {
-        set({ quakes: await fetchQuakes() });
+        const all = await fetchQuakes();
+        set({ quakes: all.filter((q) => q.magnitude >= 4.5), minorQuakes: all.filter((q) => q.magnitude < 4.5) });
       } catch {
         set({ quakes: [], notice: "Earthquakes could not be loaded from USGS." });
+      }
+    },
+    loadEvents: async () => {
+      try {
+        set({ events: await fetchEvents() });
+      } catch {
+        set({ events: [], notice: "Natural events could not be loaded from NASA." });
       }
     },
     loadAlerts: async () => {

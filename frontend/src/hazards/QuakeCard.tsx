@@ -1,9 +1,26 @@
 /** The earthquake clicked on the globe: what USGS reports, and how many people live near it. */
 import { useStore } from "../app/store";
-import { ago } from "../news/hazards";
+import { HAZARD_INFO, ago } from "../news/hazards";
 import { PeopleNear } from "./PeopleNear";
 
 const PAGER = { green: "little or no", yellow: "some", orange: "significant", red: "extensive" } as const;
+
+export function EventCard() {
+  const event = useStore((s) => s.selectedEvent);
+  const set = useStore((s) => s.set);
+  if (!event) return null;
+  return (
+    <section className="district-card quake-card" aria-label="Natural event">
+      <div className="row">
+        <p><strong>{event.title}</strong></p>
+        <button className="ghost" aria-label="Close" onClick={() => set({ selectedEvent: null })}>×</button>
+      </div>
+      <p className="muted">{HAZARD_INFO[event.hazard].label} · last reported {event.date ? ago(event.date) : "recently"} · NASA EONET</p>
+      <PeopleNear lon={event.lon} lat={event.lat} km={50} source="NASA EONET" />
+      <a className="button" href={event.url} target="_blank" rel="noopener noreferrer">Source report</a>
+    </section>
+  );
+}
 
 export function QuakeCard() {
   const quake = useStore((s) => s.selectedQuake);

@@ -38,6 +38,7 @@ import { absolute } from "../app/api";
 import type { AoiGeometry, Detection, ImageryLayerInfo, MappedResult, Overlay } from "../app/types";
 import { CloudShell } from "./clouds";
 import { rainBlend, rainTileUrl } from "./rain";
+import type { NaturalEvent } from "../hazards/events";
 import { type Satellite, positionAt, track } from "./satellites";
 import { SHADERS, type ViewMode } from "./viewModes";
 import { type WindField, advect, speedColour } from "./wind";
@@ -74,7 +75,7 @@ const ESRI_CREDIT = "Basemap: Esri, Maxar, Earthstar Geographics, and the GIS Us
 /** Seconds for a new imagery layer to fade in over the one it replaces. */
 const FADE_SECONDS = 0.6;
 const HOME = { lon: 60, lat: 22, height: 2.2e7 };
-const AOI_COLOR = Color.fromCssColorString("#6ea8fe");
+const AOI_COLOR = Color.fromCssColorString("#4fd1e0");
 const DISTRICT_COLOR = Color.fromCssColorString("#d9a441");
 const LOSS_COLOR = Color.fromCssColorString("#d0703f");
 const GAIN_COLOR = Color.fromCssColorString("#8db85a");
@@ -790,7 +791,7 @@ export class Globe {
 
   /** Fans out news, earthquake and alert badges drawn on top of each other at the current zoom, so each can be seen and clicked. */
   private spreadMarkers() {
-    const all = [...this.newsEntities, ...this.quakeEntities, ...this.alertEntities].filter((e) => e.billboard && e.position);
+    const all = [...this.newsEntities, ...this.quakeEntities, ...this.alertEntities, ...this.eventEntities].filter((e) => e.billboard && e.position);
     const now = JulianDate.now();
     const scene = this.viewer.scene;
     const { clientWidth: w, clientHeight: h } = scene.canvas;
@@ -947,6 +948,30 @@ export class Globe {
     });
     for (const k of [...this.markerNames.keys()]) if (k.startsWith("quake:")) this.markerNames.delete(k);
     for (const q of quakes) this.markerNames.set(`quake:${q.id}`, `M${q.magnitude.toFixed(1)} earthquake: ${q.place}`);
+    this.spreadMarkers();
+    this.render();
+  }
+
+  private eventEntities: Entity[] = [];
+
+  /** Natural events NASA is tracking, at their latest reported position. */
+  setEvents(events: NaturalEvent[], selectedId: string | null) {
+    for (const entity of this.eventEntities) this.viewer.entities.remove(entity);
+    this.eventEntities = events.map((e) => {
+      const selected = e.id === selectedId;
+      const position = Cartesian3.fromDegrees(e.lon, e.lat);
+      return this.viewer.entities.add({
+        id: `event:${e.id}`,
+        position,
+        billboard: {
+          ...this.zoomIcon(position, (res) => badge(e.hazard, selected ? "#ffffff" : undefined, undefined, res), iconWeight(selected ? 1 : 0)),
+          verticalOrigin: VerticalOrigin.CENTER,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        },
+      });
+    });
+    for (const k of [...this.markerNames.keys()]) if (k.startsWith("event:")) this.markerNames.delete(k);
+    for (const e of events) this.markerNames.set(`event:${e.id}`, e.title);
     this.spreadMarkers();
     this.render();
   }

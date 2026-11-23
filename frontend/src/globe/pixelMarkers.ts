@@ -106,7 +106,8 @@ export function spreadOffsets(points: ({ x: number; y: number } | null)[], cell 
   });
   const out: [number, number][] = points.map(() => [0, 0]);
   for (const members of groups) {
-    if (members.length < 2) continue;
+    // A dense swarm stays in place: a ring of dozens would hide where it really is.
+    if (members.length < 2 || members.length > 8) continue;
     const r = Math.max(radiusPx, (members.length * 5 * radiusPx) / 16);
     members.forEach((i, k) => {
       const angle = (2 * Math.PI * k) / members.length - Math.PI / 2;

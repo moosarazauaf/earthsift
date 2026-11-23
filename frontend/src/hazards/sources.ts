@@ -183,7 +183,7 @@ export function parseAlerts(body: unknown): Alert[] {
 }
 
 // ---- earthquakes -------------------------------------------------------------------
-const USGS_QUAKES = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
+const USGS_QUAKES = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson";
 
 export interface Quake {
   id: string;

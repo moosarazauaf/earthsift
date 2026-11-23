@@ -168,3 +168,7 @@ The `demo` provider generates a uniform vegetated scene in which a central
 block becomes built-up from 2010. It exists so tests have a known answer and
 the application can run offline. Results from it carry the label `SIMULATED`
 and cannot be exported as an Earth Engine script.
+
+## NASA EONET (Live natural events)
+
+Open events from the Earth Observatory Natural Event Tracker, active in the past 30 days: <https://eonet.gsfc.nasa.gov/>. Positions are the latest reported by each source; sea ice is left out.

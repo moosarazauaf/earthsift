@@ -67,7 +67,11 @@ export function GlobeViewer() {
           return;
         }
         if (id?.startsWith("quake:")) {
-          state.set({ selectedQuake: state.quakes?.find((q) => `quake:${q.id}` === id) ?? null });
+          state.set({ selectedQuake: [...(state.quakes ?? []), ...state.minorQuakes].find((q) => `quake:${q.id}` === id) ?? null });
+          return;
+        }
+        if (id?.startsWith("event:")) {
+          state.set({ selectedEvent: state.events?.find((e) => `event:${e.id}` === id) ?? null });
           return;
         }
         if (id?.startsWith("air:")) {
@@ -210,13 +214,14 @@ export function GlobeViewer() {
   // Live hazards: layers and alert markers are shown only in Live mode.
   const live = s.mode === "live";
   useEffect(() => instance?.setHazardLayers(live ? s.hazardLayers : []), [live, s.hazardLayers]);
-  useEffect(() => instance?.setAlerts(live ? s.alerts ?? [] : [], s.selectedAlert?.id ?? null), [live, s.alerts, s.selectedAlert]);
+  useEffect(() => instance?.setAlerts(live && !s.liveHidden.includes("alerts") ? s.alerts ?? [] : [], s.selectedAlert?.id ?? null), [live, s.alerts, s.selectedAlert, s.liveHidden]);
+  useEffect(() => instance?.setEvents(live ? (s.events ?? []).filter((e) => !s.liveHidden.includes(e.hazard)) : [], s.selectedEvent?.id ?? null), [live, s.events, s.selectedEvent, s.liveHidden]);
   const replay = s.quakeReplay;
-  const shownQuakes = (s.quakes ?? []).filter((q) => replay === null || Date.parse(q.time) <= replay);
+  const shownQuakes = [...(s.quakes ?? []), ...s.minorQuakes].filter((q) => replay === null || Date.parse(q.time) <= replay);
   // During a replay the markers are rebuilt only when another earthquake comes in, not on every tick.
   useEffect(() => instance?.setQuakes(live && s.quakesOn ? shownQuakes : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [live, s.quakesOn, s.quakes, shownQuakes.length]);
+    [live, s.quakesOn, s.quakes, s.minorQuakes, shownQuakes.length]);
   useEffect(() => {
     const set = useStore.getState().set;
     if (!s.rainOn) {
@@ -241,7 +246,7 @@ export function GlobeViewer() {
     if (s.selectedAlert) void instance?.flyTo(s.selectedAlert.lon, s.selectedAlert.lat, 2_500_000, 2);
   }, [s.selectedAlert]);
   const markers = useMemo(() => newsMarkers(s.news?.stories ?? [], s.quakes, s.alerts), [s.news, s.quakes, s.alerts]);
-  useEffect(() => instance?.setNews(live ? markers : [], s.selectedStory?.id ?? null), [live, markers, s.selectedStory]);
+  useEffect(() => instance?.setNews(live && !s.liveHidden.includes("news") ? markers : [], s.selectedStory?.id ?? null), [live, markers, s.selectedStory, s.liveHidden]);
   const flownTo = useRef<string | null>(null);
   useEffect(() => {
     // Fly once per selection, not again when late-arriving feeds move the marker.

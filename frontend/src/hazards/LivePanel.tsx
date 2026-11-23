@@ -104,8 +104,8 @@ function LayersTab() {
           </label>
           {quakesOn && (
             <p className="muted">
-              Earthquakes of magnitude 4.5 and above in the past 7 days, from the USGS.
-              {quakes && quakes[0] ? ` ${quakes.length} recorded; the strongest was M${quakes[0].magnitude.toFixed(1)}, ${quakes[0].place}.` : quakes ? " None recorded." : " Loading…"}
+              Earthquakes of magnitude 2.5 and above in the past 7 days, from the USGS.
+              {quakes && quakes[0] ? ` ${quakes.length} of M4.5 or more; the strongest was M${quakes[0].magnitude.toFixed(1)}, ${quakes[0].place}.` : quakes ? " None recorded." : " Loading…"}
               {" "}Magnitudes are revised as more stations report.
             </p>
           )}

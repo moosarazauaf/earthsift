@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { AreaPrompt } from "./analysis/AreaPrompt";
 import { SharedRunCard } from "./analysis/SharedRun";
 import { DistrictCard } from "./ui/DistrictCard";
-import { QuakeCard } from "./hazards/QuakeCard";
+import { EventCard, QuakeCard } from "./hazards/QuakeCard";
+import { LiveHud } from "./hazards/LiveHud";
 import { Readout } from "./ui/Readout";
 import { ContextPanel } from "./analysis/ContextPanel";
 import { decodeView, parseAt } from "./app/logic";
@@ -80,6 +81,8 @@ export function App() {
       <SharedRunCard />
       <DistrictCard />
       <QuakeCard />
+      <EventCard />
+      <LiveHud />
       <WhatsHere />
       <FirstVisit />
       <Readout />
